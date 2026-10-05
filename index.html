@@ -14,7 +14,7 @@
     </script>
     <script>
         // --- นำ URL จาก Google Apps Script มาใส่ที่นี่ ---
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8oFGsWDzifJ7-Mg8mjud8T0b8oB4mgXIcZqB0tZK0aoC8iuQLZOHV2HXVYFuwSAnG/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBqmBZQzFzE93mI3Wp6wIbZMnkfefd5w_Ye4fNPL2ZMjEZHxhrbYstVrpb4ux6o-ek/exec';
         
         document.addEventListener('DOMContentLoaded', () => {
             fetch(SCRIPT_URL + "?action=checkQuota")
@@ -72,6 +72,20 @@
             calculateTotal();
         }
 
+        function togglePaymentMethod() {
+            const isCheque = document.getElementById('payment-cheque').checked;
+            const fields = document.getElementById('cheque-fields');
+            const inputs = fields.querySelectorAll('input');
+            
+            if (isCheque) {
+                fields.classList.remove('hidden');
+                inputs.forEach(input => input.required = true);
+            } else {
+                fields.classList.add('hidden');
+                inputs.forEach(input => { input.required = false; input.value = ''; });
+            }
+        }
+
         async function submitBooking(event) {
             event.preventDefault();
             const btn = document.getElementById('submit-btn');
@@ -93,16 +107,22 @@
                 receiptCompany: formData.get('customReceiptName'),
                 sponsorship: formData.get('sponsorship'),
                 boothAmount: formData.get('boothAmount20k') || formData.get('boothAmount40k') || '',
-                totalAmount: formData.get('totalAmount')
+                totalAmount: formData.get('totalAmount'),
+                paymentMethod: formData.get('paymentMethod'),
+                chequeBank: formData.get('chequeBank'),
+                chequeBranch: formData.get('chequeBranch'),
+                chequeNo: formData.get('chequeNo'),
+                chequeDate: formData.get('chequeDate')
             };
 
             try {
                 const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                 const result = await response.json();
                 if (result.success) {
-                    Swal.fire('สำเร็จ!', `บันทึกข้อมูลเรียบร้อย\nหมายเลขใบจอง: ${result.bookingNumber}\nยอดรวม: ${Number(data.totalAmount).toLocaleString()} บาท\nระบบส่งยืนยันไปที่อีเมลแล้ว`, 'success');
+                    Swal.fire('สำเร็จ!', `บันทึกข้อมูลเรียบร้อย\nหมายเลขใบจอง: ${result.bookingNumber}\nระบบได้จัดส่งเอกสารยืนยันไปที่อีเมลของท่านแล้ว`, 'success');
                     event.target.reset();
                     calculateTotal();
+                    togglePaymentMethod();
                 } else Swal.fire('ข้อผิดพลาด', result.message, 'error');
             } catch (e) { Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', 'error'); }
             
@@ -186,9 +206,12 @@
 <body class="bg-gray-50 text-gray-800">
 
     <div class="max-w-4xl mx-auto px-4 py-10">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-chula-dark mb-2">3rd ENT CU Congress</h1>
-            <p class="text-lg text-gray-600">“Clinical practice Reimagined”</p>
+        <!-- เปลี่ยน Header เป็นชื่อเต็มที่ให้มา -->
+        <div class="text-center mb-8 space-y-2">
+            <h1 class="text-2xl md:text-3xl font-bold text-chula-dark">การสนับสนุนการประชุมวิชาการ</h1>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">the 3rd ENT CU Congress “Clinical practice Reimagined”</h2>
+            <p class="text-md md:text-lg text-gray-700 font-medium pt-2">ภาควิชา โสต ศอ นาสิกวิทยา คณะแพทยศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย</p>
+            <p class="text-md text-gray-500">วันที่ 9-10 กุมภาพันธ์ 2570 ณ ชั้น 12 อาคารภูมิสิริ โรงพยาบาลจุฬาลงกรณ์ สภากาชาดไทย</p>
         </div>
 
         <div class="flex border-b border-gray-200 mb-8 bg-white rounded-t-xl overflow-hidden shadow-sm">
@@ -198,6 +221,34 @@
 
         <!-- แท็บฟอร์มจอง -->
         <div id="booking-tab" class="bg-white rounded-b-xl rounded-t-none shadow-md p-6 md:p-10">
+            
+            <!-- กล่องแจ้งชำระเงินโดดเด่น -->
+            <div class="bg-red-50 border-l-4 border-red-500 p-6 mb-8 rounded-r-lg shadow-sm">
+                <h3 class="text-red-700 font-bold text-lg mb-2">⚠️ ข้อมูลสำคัญสำหรับการชำระเงิน</h3>
+                <p class="text-red-700 font-medium mb-4">หมายเหตุ: ขอให้ท่านแจ้งหลักฐานการโอนเงินภายในวันที่ 29 มกราคม 2570</p>
+                
+                <div class="bg-white p-5 rounded-lg border border-red-200 text-gray-800 text-sm space-y-3">
+                    <p class="flex flex-col md:flex-row md:items-start gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold whitespace-nowrap">ชำระโดยโอนเงิน</span> 
+                        <span>บัญชี ออมทรัพย์ ธ.ไทยพาณิชย์ สาขาสภากาชาดไทย<br>
+                        ชื่อบัญชี <strong>“มูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์”</strong> เลขที่ <strong>045-202069-8</strong></span>
+                    </p>
+                    <hr class="border-gray-100">
+                    <p class="flex flex-col md:flex-row md:items-start gap-2">
+                        <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded font-bold whitespace-nowrap">ชำระโดยเช็ค</span> 
+                        <span>สั่งจ่ายเช็คในนาม <strong>“มูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์”</strong><br>
+                        <span class="text-gray-500">(สำหรับเช็คภาษาอังกฤษสั่งจ่าย “M.D.FACT.FOUN”)</span></span>
+                    </p>
+                    <hr class="border-gray-100">
+                    <p class="pt-2 text-gray-700 leading-relaxed">
+                        <strong>ส่งใบแสดงความจำนง และเช็ค มาที่:</strong><br>
+                        คุณเกศแก้ว เกตุมณี (เบอร์โทรศัพท์ 02-2564000 ต่อ 61724)<br>
+                        คุณรุ่งรัตน์ จำปาเงิน (เบอร์โทรศัพท์ 02-2564000 ต่อ 61725)<br>
+                        <strong>E-mail:</strong> <a href="mailto:entcu.congress@gmail.com" class="text-blue-600 hover:underline">entcu.congress@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+
             <form onsubmit="submitBooking(event)">
                 <h2 class="text-xl font-bold text-gray-700 mb-6 pb-2 border-b-2 border-gray-100">1. ข้อมูลผู้ประสานงาน</h2>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -301,15 +352,45 @@
                     </div>
                 </div>
 
-                <!-- สรุปยอด -->
                 <div class="bg-pink-50 p-6 rounded-xl border border-pink-100 flex justify-between items-center mb-8">
                     <span class="text-lg font-bold text-gray-700">ยอดรวมเงินสนับสนุนทั้งสิ้น:</span>
                     <span class="text-3xl font-bold text-chula-dark"><span id="totalAmountDisplay">0</span> บาท</span>
                     <input type="hidden" name="totalAmount" id="totalAmountValue" value="0">
                 </div>
 
-                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-8">
-                    <p class="text-red-700 font-medium">หมายเหตุ: ขอให้ท่านแจ้งหลักฐานการโอนเงินภายในวันที่ 29 มกราคม 2570</p>
+                <!-- เพิ่มหมวดหมู่การชำระเงิน -->
+                <h2 class="text-xl font-bold text-gray-700 mb-6 pb-2 border-b-2 border-gray-100">4. วิธีการชำระเงิน <span class="text-red-500">*</span></h2>
+                <div class="space-y-4 mb-8">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="paymentMethod" value="โอนเงิน" onclick="togglePaymentMethod()" required class="w-5 h-5 text-chula">
+                        <span class="font-medium text-lg">โอนเงินเข้าบัญชีธนาคาร</span>
+                    </label>
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="radio" id="payment-cheque" name="paymentMethod" value="เช็คธนาคาร" onclick="togglePaymentMethod()" class="mt-1 w-5 h-5 text-chula">
+                        <div class="w-full">
+                            <span class="font-medium text-lg">จ่ายด้วยเช็คธนาคาร</span>
+                            
+                            <!-- ช่องกรอกข้อมูลเช็ค -->
+                            <div id="cheque-fields" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 hidden bg-gray-50 p-4 rounded-lg border">
+                                <div>
+                                    <label class="block text-sm mb-1">ธนาคาร <span class="text-red-500">*</span></label>
+                                    <input type="text" name="chequeBank" placeholder="เช่น ไทยพาณิชย์" class="w-full border rounded-lg p-2.5">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">สาขา <span class="text-red-500">*</span></label>
+                                    <input type="text" name="chequeBranch" class="w-full border rounded-lg p-2.5">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">เช็คเลขที่ <span class="text-red-500">*</span></label>
+                                    <input type="text" name="chequeNo" class="w-full border rounded-lg p-2.5">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">ลงวันที่ <span class="text-red-500">*</span></label>
+                                    <input type="date" name="chequeDate" class="w-full border rounded-lg p-2.5">
+                                </div>
+                            </div>
+                        </div>
+                    </label>
                 </div>
 
                 <button type="submit" id="submit-btn" class="w-full bg-chula text-white font-bold text-lg py-4 px-4 rounded-xl hover:bg-chula-dark transition shadow-lg">ยืนยันการแสดงความจำนง</button>
@@ -319,12 +400,12 @@
         <!-- แท็บแนบสลิป -->
         <div id="upload-tab" class="bg-white rounded-b-xl rounded-t-none shadow-md p-6 md:p-10 hidden">
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8">
-                <p class="text-blue-800 font-medium">📌 หมายเลขใบจองจะถูกส่งไปที่อีเมลของท่าน กรุณาตรวจสอบอีเมลทุกครั้งหลังทำรายการจอง</p>
+                <p class="text-blue-800 font-medium">📌 หมายเลขใบจองจะถูกส่งไปที่อีเมลของท่าน (รูปแบบ cg69-XX)</p>
             </div>
             
-            <div class="flex gap-4 mb-8">
-                <input type="text" id="searchBookingId" placeholder="ระบุเลขที่ใบจอง เช่น 01" class="flex-1 border border-gray-300 rounded-lg p-3 text-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
-                <button type="button" id="btn-search" onclick="searchBooking()" class="bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-blue-700 transition">ค้นหาข้อมูล</button>
+            <div class="flex flex-col md:flex-row gap-4 mb-8">
+                <input type="text" id="searchBookingId" placeholder="ระบุเลขที่ใบจอง เช่น cg69-01" class="flex-1 border border-gray-300 rounded-lg p-3 text-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                <button type="button" id="btn-search" onclick="searchBooking()" class="bg-blue-600 text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-700 transition">ค้นหาข้อมูล</button>
             </div>
 
             <!-- กล่องแสดงข้อมูลเมื่อค้นหาเจอ -->
@@ -365,7 +446,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold mb-2">แนบหลักฐานการโอนเงิน (รูปภาพหรือ PDF) <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-bold mb-2">แนบหลักฐานการโอนเงิน หรือรูปถ่ายเช็ค <span class="text-red-500">*</span></label>
                             <input type="file" id="slipFile" accept="image/*,.pdf" required class="w-full border rounded-lg p-2 text-sm file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
                         </div>
 
