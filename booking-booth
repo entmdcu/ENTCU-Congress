@@ -5,19 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sponsorship Registration - 3rd ENT CU Congress</title>
     
-    <!-- Fonts -->
+    <!-- 1. โหลด Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
+    <!-- 2. โหลด Tailwind CSS (ตรวจสอบให้แน่ใจว่าเครื่องเชื่อมต่ออินเทอร์เน็ต) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 3. ตั้งค่า Tailwind Colors ธีมจุฬาฯ -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        chula: '#D685A9',
-                        'chula-dark': '#b56d8e',
-                        'chula-light': '#fdf2f8'
+                        chula: {
+                            DEFAULT: '#D685A9', // สีชมพูจุฬาฯ
+                            dark: '#b56d8e',
+                            light: '#fdf2f8'
+                        }
                     },
                     fontFamily: {
                         sans: ['Prompt', 'sans-serif'],
@@ -27,312 +33,327 @@
         }
     </script>
     
-    <!-- html2pdf.js สำหรับสร้าง PDF -->
+    <!-- 4. โหลด html2pdf.js สำหรับสร้าง PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+    <!-- 5. Custom CSS เพิ่มเติมเล็กน้อย -->
     <style>
-        body {
-            background-color: #f3f4f6;
-            color: #374151;
-        }
-        /* ซ่อน input number arrows */
+        body { font-family: 'Prompt', sans-serif; background-color: #f3f4f6; }
+        /* ซ่อนลูกศรใน input type number */
         input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .spinner {
-            border: 3px solid rgba(255,255,255,0.3);
+            border: 3px solid rgba(214, 133, 169, 0.3);
             border-radius: 50%;
-            border-top: 3px solid #fff;
-            width: 20px;
-            height: 20px;
+            border-top: 3px solid #D685A9;
+            width: 30px; height: 30px;
             animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col items-center py-10 px-4">
+<body class="antialiased min-h-screen text-gray-800 pb-12">
 
-    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
-        
+    <div class="max-w-4xl mx-auto mt-4 md:mt-10 bg-white rounded-t-2xl shadow-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-chula text-white p-8 text-center">
-            <h1 class="text-2xl md:text-3xl font-bold mb-2">ใบแสดงความจำนง การสนับสนุนการประชุมวิชาการ</h1>
-            <h2 class="text-xl md:text-2xl font-semibold mb-4 text-chula-light">the 3rd ENT CU Congress "Clinical practice Reimagined"</h2>
-            <div class="text-sm md:text-base font-light space-y-1">
-                <p>ภาควิชา โสต ศอ นาสิกวิทยา คณะแพทยศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย</p>
-                <p>วันที่ 9-10 กุมภาพันธ์ 2570 ณ ชั้น 12 อาคารภูมิสิริ</p>
-                <p>โรงพยาบาลจุฬาลงกรณ์ สภากาชาดไทย</p>
+        <div class="bg-chula text-white p-6 md:p-10 text-center relative overflow-hidden">
+            <div class="relative z-10">
+                <h1 class="text-2xl md:text-3xl font-bold mb-3 drop-shadow-md">ใบแสดงความจำนง การสนับสนุนการประชุมวิชาการ</h1>
+                <h2 class="text-xl md:text-2xl font-semibold mb-5 text-pink-100">the 3rd ENT CU Congress "Clinical practice Reimagined"</h2>
+                <div class="text-sm md:text-base font-light space-y-1 opacity-90">
+                    <p>ภาควิชา โสต ศอ นาสิกวิทยา คณะแพทยศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย</p>
+                    <p>วันที่ 9-10 กุมภาพันธ์ 2570 ณ ชั้น 12 อาคารภูมิสิริ</p>
+                    <p>โรงพยาบาลจุฬาลงกรณ์ สภากาชาดไทย</p>
+                </div>
             </div>
+            <!-- Decorative circle -->
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-black opacity-10 rounded-full blur-2xl"></div>
         </div>
 
         <!-- Navigation Tabs -->
-        <div class="flex border-b border-gray-200">
-            <button id="tab-form-btn" class="flex-1 py-4 text-center font-semibold text-chula border-b-4 border-chula transition-colors focus:outline-none">
-                ฟอร์มจองพื้นที่ (Registration)
+        <div class="flex border-b border-gray-200 bg-gray-50">
+            <button id="tab-form-btn" class="flex-1 py-4 text-center font-semibold text-chula border-b-4 border-chula bg-white transition-all focus:outline-none">
+                1. กรอกใบจอง
             </button>
-            <button id="tab-slip-btn" class="flex-1 py-4 text-center font-semibold text-gray-500 hover:text-chula border-b-4 border-transparent hover:border-chula-light transition-colors focus:outline-none">
-                อัปโหลดสลิป (Upload Slip)
+            <button id="tab-slip-btn" class="flex-1 py-4 text-center font-semibold text-gray-500 hover:text-chula border-b-4 border-transparent hover:bg-white transition-all focus:outline-none">
+                2. อัปโหลดสลิป / แจ้งเช็ค
             </button>
-        </div>
-
-        <div class="p-6 md:p-8">
-            <!-- Loading Overlay (Global) -->
-            <div id="global-loading" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-lg flex items-center flex-col">
-                    <div class="spinner !border-chula !border-t-chula-dark mb-4 !w-10 !h-10"></div>
-                    <p class="text-chula font-semibold" id="loading-text">กำลังประมวลผล...</p>
-                </div>
-            </div>
-
-            <!-- TAB 1: Registration Form -->
-            <div id="tab-form" class="block">
-                <form id="registration-form" class="space-y-8">
-                    
-                    <!-- Section 1: ข้อมูลผู้จอง -->
-                    <section class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                        <h3 class="text-lg font-bold text-chula mb-4 border-b pb-2">ข้อมูลผู้จอง</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
-                                <input type="text" id="r_name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula focus:border-transparent outline-none transition-shadow">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ตำแหน่ง <span class="text-red-500">*</span></label>
-                                <input type="text" id="r_position" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula outline-none transition-shadow">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ในนามบริษัท <span class="text-red-500">*</span></label>
-                                <input type="text" id="r_company" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula outline-none transition-shadow">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ที่อยู่ <span class="text-red-500">*</span></label>
-                                <textarea id="r_address" rows="2" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula outline-none transition-shadow"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">โทรศัพท์ <span class="text-red-500">*</span></label>
-                                <input type="tel" id="r_phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula outline-none transition-shadow">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">โทรสาร</label>
-                                <input type="tel" id="r_fax" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula outline-none transition-shadow">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">E-mail <span class="text-red-500">*</span></label>
-                                <input type="email" id="r_email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula outline-none transition-shadow">
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Section 2: แพ็กเกจสนับสนุน -->
-                    <section class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                        <h3 class="text-lg font-bold text-chula mb-4 border-b pb-2">แพ็กเกจการสนับสนุน <span class="text-sm font-normal text-gray-500">(เลือกได้อย่างน้อย 1 รายการ)</span></h3>
-                        
-                        <div class="space-y-4">
-                            <!-- Pkg 1 -->
-                            <div class="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                <label class="flex items-start md:items-center space-x-3 cursor-pointer">
-                                    <input type="checkbox" id="pkg_1_check" class="w-5 h-5 mt-1 md:mt-0 text-chula rounded focus:ring-chula form-checkbox accent-chula">
-                                    <div>
-                                        <span class="block font-medium">เงินสนับสนุน 20,000 บาท/booth</span>
-                                        <span class="block text-sm text-gray-500">ขนาด 1.5m x 0.75m</span>
-                                    </div>
-                                </label>
-                                <div class="mt-3 md:mt-0 flex items-center space-x-2 md:pl-4">
-                                    <span class="text-sm text-gray-600">จำนวน</span>
-                                    <input type="number" id="pkg_1_qty" min="1" value="1" disabled class="w-20 px-3 py-1 border border-gray-300 rounded-md disabled:bg-gray-100 text-center focus:ring-2 focus:ring-chula outline-none">
-                                    <span class="text-sm text-gray-600">booth</span>
-                                </div>
-                            </div>
-
-                            <!-- Pkg 2 -->
-                            <div class="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                <label class="flex items-start md:items-center space-x-3 cursor-pointer">
-                                    <input type="checkbox" id="pkg_2_check" class="w-5 h-5 mt-1 md:mt-0 text-chula rounded focus:ring-chula form-checkbox accent-chula">
-                                    <div>
-                                        <span class="block font-medium">เงินสนับสนุน 40,000 บาท/booth</span>
-                                        <span class="block text-sm text-gray-500">ขนาด 3m x 0.75m</span>
-                                    </div>
-                                </label>
-                                <div class="mt-3 md:mt-0 flex items-center space-x-2 md:pl-4">
-                                    <span class="text-sm text-gray-600">จำนวน</span>
-                                    <input type="number" id="pkg_2_qty" min="1" value="1" disabled class="w-20 px-3 py-1 border border-gray-300 rounded-md disabled:bg-gray-100 text-center focus:ring-2 focus:ring-chula outline-none">
-                                    <span class="text-sm text-gray-600">booth</span>
-                                </div>
-                            </div>
-
-                            <!-- Pkg 3 -->
-                            <div class="p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                <label class="flex items-start space-x-3 cursor-pointer">
-                                    <input type="checkbox" id="pkg_3_check" class="w-5 h-5 mt-1 text-chula rounded focus:ring-chula form-checkbox accent-chula">
-                                    <div>
-                                        <span class="block font-medium text-lg">เงินสนับสนุน lunch symposium 200,000 บาท</span>
-                                        <span class="block text-sm text-red-500 font-medium mb-2">(จำกัดไม่เกิน 2 บริษัท)</span>
-                                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                            <li>Booth ขนาด (3m x 0.75m) 1 booth</li>
-                                            <li>Lecture 1 session from company</li>
-                                            <li>แพทย์ลงทะเบียน lecture 25 ท่าน และ lecture + workshop 5 ท่าน</li>
-                                        </ul>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Total Summary -->
-                        <div class="mt-6 flex justify-end items-center text-lg font-bold text-gray-800">
-                            ยอดรวมที่ต้องชำระ: <span id="total_amount_display" class="ml-3 text-2xl text-chula">0</span> <span class="ml-2 text-sm">บาท</span>
-                        </div>
-                    </section>
-
-                    <!-- Section 3: วิธีการชำระเงิน -->
-                    <section class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                        <h3 class="text-lg font-bold text-chula mb-4 border-b pb-2">วิธีการชำระเงิน</h3>
-                        <div class="space-y-4">
-                            
-                            <!-- โอนเงิน -->
-                            <label class="flex items-start p-4 border border-gray-200 rounded-lg cursor-pointer bg-white hover:bg-gray-50 transition-colors">
-                                <input type="radio" name="payment_method" value="transfer" checked class="w-5 h-5 mt-0.5 text-chula focus:ring-chula accent-chula">
-                                <div class="ml-3">
-                                    <span class="block font-medium">โอนเงินเข้าบัญชี (Bank Transfer)</span>
-                                    <div class="text-sm text-gray-600 mt-2 p-3 bg-blue-50 rounded-md border border-blue-100">
-                                        <p><strong>ธนาคาร:</strong> ไทยพาณิชย์ (SCB) สาขาสภากาชาดไทย</p>
-                                        <p><strong>ชื่อบัญชี:</strong> "มูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์"</p>
-                                        <p class="text-lg font-bold text-blue-800 mt-1">เลขที่บัญชี: 045-202069-8</p>
-                                    </div>
-                                </div>
-                            </label>
-
-                            <!-- เช็ค -->
-                            <label class="flex items-start p-4 border border-gray-200 rounded-lg cursor-pointer bg-white hover:bg-gray-50 transition-colors">
-                                <input type="radio" name="payment_method" value="cheque" class="w-5 h-5 mt-0.5 text-chula focus:ring-chula accent-chula">
-                                <div class="ml-3 w-full">
-                                    <span class="block font-medium">เช็คธนาคาร (Cheque)</span>
-                                    <p class="text-xs text-gray-500 mt-1 mb-2">สั่งจ่าย: "มูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์" (หรือ "M.D.FACT.FOUN")</p>
-                                    
-                                    <div id="cheque_details" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                                        <input type="text" id="cq_bank" placeholder="ธนาคาร" class="px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:border-chula">
-                                        <input type="text" id="cq_branch" placeholder="สาขา" class="px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:border-chula">
-                                        <input type="text" id="cq_number" placeholder="เลขที่เช็ค" class="px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:border-chula">
-                                        <input type="date" id="cq_date" class="px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:border-chula text-gray-500">
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </section>
-
-                    <!-- Contact Info -->
-                    <div class="text-sm text-gray-500 text-center mt-8 p-4 bg-chula-light rounded-lg">
-                        <p class="font-semibold text-chula mb-1">ส่งใบแสดงความจำนง และเช็ค มาที่:</p>
-                        <p>คุณเกศแก้ว เกตุมณี โทร. 02-2564000 ต่อ 61724</p>
-                        <p>คุณรุ่งรัตน์ จำปาเงิน โทร. 02-2564000 ต่อ 61725</p>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="text-center pt-4">
-                        <button type="submit" id="submit-booking-btn" class="bg-chula hover:bg-chula-dark text-white font-bold py-3 px-10 rounded-full shadow-lg transform transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-chula-light text-lg">
-                            ยืนยันการจองและสร้าง PDF
-                        </button>
-                        <p class="text-xs text-gray-400 mt-3">* เมื่อกดปุ่ม ระบบจะสร้างรหัสการจองและดาวน์โหลดใบจองอัตโนมัติ</p>
-                    </div>
-                </form>
-            </div>
-
-            <!-- TAB 2: Upload Slip -->
-            <div id="tab-slip" class="hidden">
-                <div class="max-w-2xl mx-auto">
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                        <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">ค้นหาใบจองเพื่ออัปโหลดสลิป</h3>
-                        
-                        <!-- Search Box -->
-                        <div class="flex space-x-2 mb-8">
-                            <input type="text" id="search_booking_id" placeholder="กรอกรหัสใบจอง เช่น ENT27-1234" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula outline-none text-center font-bold text-gray-700 tracking-wide uppercase">
-                            <button id="search-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                                ค้นหา
-                            </button>
-                        </div>
-
-                        <!-- Result Area (Hidden initially) -->
-                        <div id="upload_section" class="hidden space-y-6">
-                            <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
-                                <h4 class="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-2">ข้อมูลการจอง</h4>
-                                <div class="grid grid-cols-2 gap-y-2 text-sm">
-                                    <div class="text-gray-600">รหัสใบจอง:</div>
-                                    <div class="font-bold text-gray-900" id="disp_booking_id">-</div>
-                                    <div class="text-gray-600">บริษัท:</div>
-                                    <div class="font-medium text-gray-900" id="disp_company">-</div>
-                                    <div class="text-gray-600">ผู้ติดต่อ:</div>
-                                    <div class="text-gray-900" id="disp_name">-</div>
-                                    <div class="text-gray-600 mt-2">ยอดที่ต้องชำระ:</div>
-                                    <div class="font-bold text-chula text-lg mt-2" id="disp_total">- บาท</div>
-                                </div>
-                            </div>
-
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors" id="drop_zone">
-                                <input type="file" id="slip_file" accept="image/*" class="hidden">
-                                <label for="slip_file" class="cursor-pointer block">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                    <span class="text-sm text-gray-600 block mb-1">คลิกเพื่อเลือกไฟล์รูปภาพสลิป</span>
-                                    <span class="text-xs text-gray-400 block">(รองรับ JPG, PNG ขนาดไม่เกิน 5MB)</span>
-                                </label>
-                                <div id="preview_container" class="hidden mt-4">
-                                    <img id="slip_preview" src="" alt="Slip Preview" class="max-h-48 mx-auto rounded shadow-sm">
-                                    <button id="remove_slip_btn" class="mt-2 text-red-500 text-sm hover:underline">เปลี่ยนรูปภาพ</button>
-                                </div>
-                            </div>
-
-                            <!-- Alert Messages -->
-                            <div id="upload_alert" class="hidden p-4 rounded-lg text-sm text-center font-medium"></div>
-
-                            <button id="submit_slip_btn" disabled class="w-full bg-chula hover:bg-chula-dark text-white font-bold py-3 rounded-lg shadow disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                                ยืนยันการอัปโหลดหลักฐาน
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <!-- Hidden div for PDF generation -->
+    <div class="max-w-4xl mx-auto bg-white rounded-b-2xl shadow-lg p-6 md:p-10">
+        
+        <!-- Loading Overlay -->
+        <div id="global-loading" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center backdrop-blur-sm">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center">
+                <div class="spinner mb-4"></div>
+                <p class="text-chula font-bold text-lg" id="loading-text">กำลังประมวลผล...</p>
+            </div>
+        </div>
+
+        <!-- ================= TAB 1: FORM ================= -->
+        <div id="tab-form" class="block animate-fade-in">
+            <form id="registration-form" class="space-y-8">
+                
+                <!-- Section 1: ข้อมูลบริษัท -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <h3 class="text-lg font-bold text-chula mb-4 border-b border-gray-100 pb-2 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        ข้อมูลผู้จอง
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
+                            <input type="text" id="r_name" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula focus:border-transparent outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ตำแหน่ง <span class="text-red-500">*</span></label>
+                            <input type="text" id="r_position" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none transition-all">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ในนามบริษัท <span class="text-red-500">*</span></label>
+                            <input type="text" id="r_company" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none transition-all">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ที่อยู่ <span class="text-red-500">*</span></label>
+                            <textarea id="r_address" rows="2" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none transition-all"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">โทรศัพท์ <span class="text-red-500">*</span></label>
+                            <input type="tel" id="r_phone" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">โทรสาร</label>
+                            <input type="tel" id="r_fax" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none transition-all">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">E-mail <span class="text-red-500">*</span></label>
+                            <input type="email" id="r_email" required class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: แพ็กเกจ -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <h3 class="text-lg font-bold text-chula mb-4 border-b border-gray-100 pb-2 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        ขอสนับสนุนการประชุมวิชาการ
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Pkg 1 -->
+                        <label class="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-chula-light transition-colors">
+                            <div class="flex items-start md:items-center space-x-3">
+                                <input type="checkbox" id="pkg_1_check" class="w-5 h-5 mt-1 md:mt-0 text-chula rounded focus:ring-chula accent-chula">
+                                <div>
+                                    <span class="block font-medium text-gray-800">เงินสนับสนุน 20,000 บาท/booth</span>
+                                    <span class="block text-sm text-gray-500">ขนาด 1.5m x 0.75m</span>
+                                </div>
+                            </div>
+                            <div class="mt-3 md:mt-0 flex items-center space-x-2 md:pl-4" onclick="event.preventDefault()">
+                                <span class="text-sm text-gray-600">จำนวน</span>
+                                <input type="number" id="pkg_1_qty" min="1" value="1" disabled class="w-20 px-3 py-1.5 border border-gray-300 rounded-md disabled:bg-gray-200 disabled:text-gray-400 text-center focus:ring-2 focus:ring-chula outline-none">
+                                <span class="text-sm text-gray-600">booth</span>
+                            </div>
+                        </label>
+
+                        <!-- Pkg 2 -->
+                        <label class="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-chula-light transition-colors">
+                            <div class="flex items-start md:items-center space-x-3">
+                                <input type="checkbox" id="pkg_2_check" class="w-5 h-5 mt-1 md:mt-0 text-chula rounded focus:ring-chula accent-chula">
+                                <div>
+                                    <span class="block font-medium text-gray-800">เงินสนับสนุน 40,000 บาท/booth</span>
+                                    <span class="block text-sm text-gray-500">ขนาด 3m x 0.75m</span>
+                                </div>
+                            </div>
+                            <div class="mt-3 md:mt-0 flex items-center space-x-2 md:pl-4" onclick="event.preventDefault()">
+                                <span class="text-sm text-gray-600">จำนวน</span>
+                                <input type="number" id="pkg_2_qty" min="1" value="1" disabled class="w-20 px-3 py-1.5 border border-gray-300 rounded-md disabled:bg-gray-200 disabled:text-gray-400 text-center focus:ring-2 focus:ring-chula outline-none">
+                                <span class="text-sm text-gray-600">booth</span>
+                            </div>
+                        </label>
+
+                        <!-- Pkg 3 -->
+                        <label class="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-chula-light transition-colors">
+                            <input type="checkbox" id="pkg_3_check" class="w-5 h-5 mt-1 text-chula rounded focus:ring-chula accent-chula">
+                            <div>
+                                <span class="block font-medium text-lg text-gray-800">เงินสนับสนุน lunch symposium 200,000 บาท</span>
+                                <span class="block text-sm text-red-500 font-medium mb-2">(จำกัดไม่เกิน 2 บริษัท)</span>
+                                <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                                    <li>Booth ขนาด (3m x 0.75m) 1 booth</li>
+                                    <li>Lecture 1 session from company</li>
+                                    <li>แพทย์ลงทะเบียน lecture 25 ท่าน และ lecture + workshop 5 ท่าน</li>
+                                </ul>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-chula-light rounded-lg flex justify-end items-center">
+                        <span class="text-lg font-bold text-gray-700">ยอดรวมที่ต้องชำระ:</span>
+                        <span id="total_amount_display" class="ml-3 text-3xl font-bold text-chula">0</span> 
+                        <span class="ml-2 text-gray-600">บาท</span>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button type="submit" id="submit-booking-btn" class="bg-chula hover:bg-chula-dark text-white font-bold py-4 px-12 rounded-xl shadow-lg transform transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-pink-200 text-lg w-full md:w-auto">
+                        ยืนยันการจอง และสร้าง PDF
+                    </button>
+                    <p class="text-sm text-gray-500 mt-4">* ระบบจะสร้างรหัสใบจอง (Booking ID) เพื่อใช้สำหรับแนบหลักฐานในแท็บถัดไป</p>
+                </div>
+            </form>
+        </div>
+
+        <!-- ================= TAB 2: UPLOAD / CHEQUE ================= -->
+        <div id="tab-slip" class="hidden animate-fade-in">
+            
+            <div class="max-w-2xl mx-auto space-y-8">
+                <!-- ค้นหาใบจอง -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm text-center">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">ค้นหาใบจองเพื่อแนบหลักฐานการชำระเงิน</h3>
+                    <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                        <input type="text" id="search_booking_id" placeholder="กรอกรหัสใบจอง เช่น ENT27-XXXX" class="flex-1 px-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chula outline-none text-center font-bold text-gray-700 tracking-wider uppercase text-lg bg-gray-50">
+                        <button id="search-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow">
+                            ค้นหา
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ส่วนแสดงผลหลังค้นหาเจอ -->
+                <div id="upload_section" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    
+                    <div class="bg-blue-50 p-5 border-b border-blue-100">
+                        <h4 class="font-bold text-blue-800 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            ข้อมูลใบจอง
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div><span class="text-gray-500">รหัสใบจอง:</span> <span class="font-bold text-gray-900 text-base" id="disp_booking_id">-</span></div>
+                            <div><span class="text-gray-500">บริษัท:</span> <span class="font-medium text-gray-900" id="disp_company">-</span></div>
+                            <div><span class="text-gray-500">ผู้ติดต่อ:</span> <span class="text-gray-900" id="disp_name">-</span></div>
+                            <div><span class="text-gray-500">ยอดชำระ:</span> <span class="font-bold text-chula text-lg" id="disp_total">- บาท</span></div>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <h4 class="font-bold text-gray-800 mb-4">เลือกวิธีการชำระเงิน</h4>
+                        
+                        <!-- Tabs สำหรับเลือกวิธีชำระเงินใน Tab 2 -->
+                        <div class="flex space-x-4 mb-6">
+                            <label class="flex-1 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 flex items-center payment-type-label">
+                                <input type="radio" name="pay_type" value="transfer" checked class="w-5 h-5 text-chula accent-chula">
+                                <span class="ml-3 font-medium">โอนเงิน (แนบสลิป)</span>
+                            </label>
+                            <label class="flex-1 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 flex items-center payment-type-label">
+                                <input type="radio" name="pay_type" value="cheque" class="w-5 h-5 text-chula accent-chula">
+                                <span class="ml-3 font-medium">สั่งจ่ายเช็ค</span>
+                            </label>
+                        </div>
+
+                        <!-- Panel: แนบสลิป -->
+                        <div id="panel_transfer" class="block animate-fade-in">
+                            <div class="mb-4 p-4 bg-yellow-50 text-sm text-yellow-800 rounded-lg border border-yellow-200">
+                                <p><strong>บัญชีรับโอน:</strong> ออมทรัพย์ ธ.ไทยพาณิชย์ สาขาสภากาชาดไทย</p>
+                                <p><strong>ชื่อบัญชี:</strong> "มูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์"</p>
+                                <p><strong>เลขที่:</strong> 045-202069-8</p>
+                            </div>
+                            
+                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors" id="drop_zone">
+                                <input type="file" id="slip_file" accept="image/jpeg, image/png, image/jpg" class="hidden">
+                                <label for="slip_file" class="cursor-pointer block">
+                                    <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                    <span class="text-base text-gray-700 font-medium block mb-1">คลิกเพื่อเลือกไฟล์สลิปโอนเงิน</span>
+                                    <span class="text-sm text-gray-400 block">(JPG, PNG ขนาดไม่เกิน 5MB)</span>
+                                </label>
+                                <div id="preview_container" class="hidden mt-4">
+                                    <img id="slip_preview" src="" alt="Slip Preview" class="max-h-64 mx-auto rounded-lg shadow-md border border-gray-200">
+                                    <button id="remove_slip_btn" class="mt-3 text-red-500 text-sm font-medium hover:underline px-4 py-2 rounded-lg hover:bg-red-50">ลบ/เปลี่ยนรูปภาพ</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel: กรอกข้อมูลเช็ค -->
+                        <div id="panel_cheque" class="hidden animate-fade-in space-y-4">
+                            <div class="p-4 bg-yellow-50 text-sm text-yellow-800 rounded-lg border border-yellow-200 mb-4">
+                                <p>สั่งจ่ายเช็คในนาม: <strong>“มูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์”</strong></p>
+                                <p class="text-xs text-yellow-700 mt-1">หรือภาษาอังกฤษ: “M.D.FACT.FOUN”</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">เช็คธนาคาร</label>
+                                    <input type="text" id="cq_bank" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">สาขา</label>
+                                    <input type="text" id="cq_branch" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">เลขที่เช็ค</label>
+                                    <input type="text" id="cq_number" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">ลงวันที่</label>
+                                    <input type="date" id="cq_date" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-chula outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alert Box -->
+                        <div id="upload_alert" class="hidden mt-6 p-4 rounded-lg text-sm text-center font-medium"></div>
+
+                        <button id="submit_evidence_btn" class="mt-6 w-full bg-chula hover:bg-chula-dark text-white font-bold py-4 rounded-xl shadow-md transition-colors text-lg">
+                            บันทึกหลักฐานการชำระเงิน
+                        </button>
+                        
+                        <div class="mt-6 text-sm text-gray-500 text-center bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <p class="font-semibold text-gray-700 mb-1">ส่งเช็คตัวจริง หรือเอกสาร มาที่:</p>
+                            <p>คุณเกศแก้ว เกตุมณี เบอร์โทรศัพท์ 02-2564000 ต่อ 61724</p>
+                            <p>คุณรุ่งรัตน์ จำปาเงิน เบอร์โทรศัพท์ 02-2564000 ต่อ 61725</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden container for PDF rendering -->
     <div id="pdf-container" style="display: none;"></div>
 
-    <!-- Modal Message -->
-    <div id="message-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full mx-4 text-center transform transition-all scale-100">
-            <div id="modal-icon" class="mb-4"></div>
-            <h3 id="modal-title" class="text-xl font-bold mb-2 text-gray-800">Title</h3>
-            <p id="modal-desc" class="text-gray-600 mb-6 text-sm">Description</p>
-            <button id="modal-close-btn" class="w-full bg-chula hover:bg-chula-dark text-white font-bold py-2 px-4 rounded-lg transition-colors">
+    <!-- Modal -->
+    <div id="message-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-[60] flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center">
+            <div id="modal-icon" class="mb-5"></div>
+            <h3 id="modal-title" class="text-2xl font-bold mb-3 text-gray-800">Title</h3>
+            <p id="modal-desc" class="text-gray-600 mb-8 text-base">Description</p>
+            <button id="modal-close-btn" class="w-full bg-chula hover:bg-chula-dark text-white font-bold py-3 px-4 rounded-xl transition-colors shadow">
                 ตกลง
             </button>
         </div>
     </div>
 
     <script type="module">
+        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration injected by environment
+        // Environment variables
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ent-sponsorship-app';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // Dummy config for local preview bypass if needed, but error will show in real environment without actual config
             apiKey: "dummy", authDomain: "dummy", projectId: "dummy"
         };
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
         let isAuthReady = false;
 
-        // UI Utilities
+        // UI Helpers
         const showLoading = (text) => {
             document.getElementById('loading-text').innerText = text || 'กำลังประมวลผล...';
             document.getElementById('global-loading').classList.remove('hidden');
@@ -343,14 +364,12 @@
             const modal = document.getElementById('message-modal');
             const iconDiv = document.getElementById('modal-icon');
             if(type === 'success') {
-                iconDiv.innerHTML = `<svg class="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                iconDiv.innerHTML = `<svg class="w-20 h-20 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
             } else if (type === 'error') {
-                iconDiv.innerHTML = `<svg class="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-            } else {
-                iconDiv.innerHTML = '';
+                iconDiv.innerHTML = `<svg class="w-20 h-20 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
             }
             document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerHTML = desc; // allow html
+            document.getElementById('modal-desc').innerHTML = desc;
             modal.classList.remove('hidden');
             
             document.getElementById('modal-close-btn').onclick = () => {
@@ -359,7 +378,7 @@
             };
         };
 
-        // Initialize Authentication (CRITICAL RULE 3)
+        // Authenticate (Required for Firestore)
         async function initAuth() {
             try {
                 if (initialAuthToken) {
@@ -368,38 +387,43 @@
                     await signInAnonymously(auth);
                 }
                 isAuthReady = true;
-                console.log("Firebase Auth Ready. User ID:", auth.currentUser.uid);
+                console.log("Firebase Auth Ready");
             } catch (error) {
                 console.error("Auth error:", error);
-                showModal('error', 'Authentication Failed', 'ไม่สามารถเชื่อมต่อระบบฐานข้อมูลได้ โปรดลองรีเฟรชหน้าเว็บ');
             }
         }
         initAuth();
 
-        
-        // Tab Switching
+        // Tabs Logic
         const tabFormBtn = document.getElementById('tab-form-btn');
         const tabSlipBtn = document.getElementById('tab-slip-btn');
         const tabForm = document.getElementById('tab-form');
         const tabSlip = document.getElementById('tab-slip');
 
-        tabFormBtn.addEventListener('click', () => {
-            tabForm.classList.remove('hidden');
-            tabSlip.classList.add('hidden');
-            tabFormBtn.classList.replace('text-gray-500', 'text-chula');
-            tabFormBtn.classList.replace('border-transparent', 'border-chula');
-            tabSlipBtn.classList.replace('text-chula', 'text-gray-500');
-            tabSlipBtn.classList.replace('border-chula', 'border-transparent');
-        });
+        function switchTab(tab) {
+            if (tab === 'form') {
+                tabForm.classList.remove('hidden');
+                tabSlip.classList.add('hidden');
+                tabFormBtn.classList.replace('text-gray-500', 'text-chula');
+                tabFormBtn.classList.replace('border-transparent', 'border-chula');
+                tabFormBtn.classList.replace('bg-white', 'bg-white'); // keep
+                tabSlipBtn.classList.replace('text-chula', 'text-gray-500');
+                tabSlipBtn.classList.replace('border-chula', 'border-transparent');
+                tabSlipBtn.classList.remove('bg-white');
+            } else {
+                tabSlip.classList.remove('hidden');
+                tabForm.classList.add('hidden');
+                tabSlipBtn.classList.replace('text-gray-500', 'text-chula');
+                tabSlipBtn.classList.replace('border-transparent', 'border-chula');
+                tabSlipBtn.classList.add('bg-white');
+                tabFormBtn.classList.replace('text-chula', 'text-gray-500');
+                tabFormBtn.classList.replace('border-chula', 'border-transparent');
+                tabFormBtn.classList.remove('bg-white');
+            }
+        }
 
-        tabSlipBtn.addEventListener('click', () => {
-            tabSlip.classList.remove('hidden');
-            tabForm.classList.add('hidden');
-            tabSlipBtn.classList.replace('text-gray-500', 'text-chula');
-            tabSlipBtn.classList.replace('border-transparent', 'border-chula');
-            tabFormBtn.classList.replace('text-chula', 'text-gray-500');
-            tabFormBtn.classList.replace('border-chula', 'border-transparent');
-        });
+        tabFormBtn.addEventListener('click', () => switchTab('form'));
+        tabSlipBtn.addEventListener('click', () => switchTab('slip'));
 
         // Form Logic & Calculation
         const pkgs = [
@@ -407,20 +431,20 @@
             { check: document.getElementById('pkg_2_check'), qty: document.getElementById('pkg_2_qty'), price: 40000 },
             { check: document.getElementById('pkg_3_check'), qty: null, price: 200000 }
         ];
-        const totalDisplay = document.getElementById('total_amount_display');
         
         function updateTotal() {
             let total = 0;
             pkgs.forEach(pkg => {
                 if (pkg.check.checked) {
                     if (pkg.qty) {
-                        total += pkg.price * parseInt(pkg.qty.value || 1);
+                        total += pkg.price * (parseInt(pkg.qty.value) || 1);
                     } else {
                         total += pkg.price;
                     }
                 }
             });
-            totalDisplay.innerText = total.toLocaleString();
+            document.getElementById('total_amount_display').innerText = total.toLocaleString();
+            return total;
         }
 
         pkgs.forEach(pkg => {
@@ -428,104 +452,76 @@
                 if (pkg.qty) pkg.qty.disabled = !e.target.checked;
                 updateTotal();
             });
-            if (pkg.qty) {
-                pkg.qty.addEventListener('input', updateTotal);
-            }
+            if (pkg.qty) pkg.qty.addEventListener('input', updateTotal);
         });
 
-        // Payment Method Toggle
-        const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
-        const chequeDetails = document.getElementById('cheque_details');
-        
-        paymentRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                if (e.target.value === 'cheque') {
-                    chequeDetails.classList.remove('hidden');
-                    document.getElementById('cq_bank').required = true;
-                } else {
-                    chequeDetails.classList.add('hidden');
-                    document.getElementById('cq_bank').required = false;
-                }
-            });
-        });
-
-        
-        // Generate PDF using html2pdf
-        function generateAndDownloadPDF(bookingId, formData, totalAmount) {
+        // PDF Generation
+        function generatePDF(bookingId, formData, totalAmount) {
             return new Promise((resolve) => {
                 const container = document.getElementById('pdf-container');
-                
-                // Construct Date
                 const d = new Date();
                 const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear() + 543}`;
 
-                // Package details string
                 let pkgDetails = '';
-                if(formData.packages.pkg1.selected) pkgDetails += `<p>- เงินสนับสนุน 20,000 บาท/booth จำนวน ${formData.packages.pkg1.qty} booth (รวม ${(20000 * formData.packages.pkg1.qty).toLocaleString()} บาท)</p>`;
-                if(formData.packages.pkg2.selected) pkgDetails += `<p>- เงินสนับสนุน 40,000 บาท/booth จำนวน ${formData.packages.pkg2.qty} booth (รวม ${(40000 * formData.packages.pkg2.qty).toLocaleString()} บาท)</p>`;
-                if(formData.packages.pkg3.selected) pkgDetails += `<p>- เงินสนับสนุน lunch symposium 200,000 บาท</p>`;
-
-                // Payment details string
-                let payDetails = '';
-                if(formData.payment.method === 'transfer') {
-                    payDetails = `<p><strong>โอนเงิน:</strong> เข้าบัญชี ออมทรัพย์ ธ.ไทยพาณิชย์ สาขาสภากาชาดไทย ชื่อบัญชี "มูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์" เลขที่ 045-202069-8</p>`;
-                } else {
-                    payDetails = `<p><strong>เช็คธนาคาร:</strong> ${formData.payment.cheque.bank} สาขา ${formData.payment.cheque.branch} <br>เลขที่: ${formData.payment.cheque.number} ลงวันที่: ${formData.payment.cheque.date}</p>`;
-                }
+                if(formData.packages.pkg1.selected) pkgDetails += `<div style="margin-bottom:8px;">- เงินสนับสนุน 20,000 บาท/booth จำนวน ${formData.packages.pkg1.qty} booth (รวม ${(20000 * formData.packages.pkg1.qty).toLocaleString()} บาท)</div>`;
+                if(formData.packages.pkg2.selected) pkgDetails += `<div style="margin-bottom:8px;">- เงินสนับสนุน 40,000 บาท/booth จำนวน ${formData.packages.pkg2.qty} booth (รวม ${(40000 * formData.packages.pkg2.qty).toLocaleString()} บาท)</div>`;
+                if(formData.packages.pkg3.selected) pkgDetails += `<div style="margin-bottom:8px;">- เงินสนับสนุน lunch symposium 200,000 บาท</div>`;
 
                 container.innerHTML = `
-                    <div style="font-family: 'Prompt', sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto;">
+                    <div style="font-family: 'Prompt', sans-serif; padding: 40px; color: #333; width: 800px; margin: 0 auto; background: white;">
                         <div style="text-align: center; margin-bottom: 30px;">
-                            <h2 style="color: #D685A9; font-size: 24px; margin: 0 0 10px 0;">ใบแสดงความจำนง การสนับสนุนการประชุมวิชาการ</h2>
-                            <h3 style="font-size: 18px; margin: 0 0 5px 0;">the 3rd ENT CU Congress "Clinical practice Reimagined"</h3>
-                            <p style="font-size: 14px; margin: 0; color: #555;">
+                            <h2 style="color: #D685A9; font-size: 26px; margin: 0 0 10px 0;">ใบแสดงความจำนง การสนับสนุนการประชุมวิชาการ</h2>
+                            <h3 style="font-size: 20px; margin: 0 0 10px 0;">the 3rd ENT CU Congress "Clinical practice Reimagined"</h3>
+                            <p style="font-size: 14px; margin: 0; color: #555; line-height: 1.5;">
                                 ภาควิชา โสต ศอ นาสิกวิทยา คณะแพทยศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย<br>
                                 วันที่ 9-10 กุมภาพันธ์ 2570 ณ ชั้น 12 อาคารภูมิสิริ<br>
                                 โรงพยาบาลจุฬาลงกรณ์ สภากาชาดไทย
                             </p>
                         </div>
                         
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #D685A9; padding-bottom: 10px;">
-                            <div style="font-size: 18px; font-weight: bold;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 25px; border-bottom: 2px solid #D685A9; padding-bottom: 15px;">
+                            <div style="font-size: 20px; font-weight: bold;">
                                 รหัสใบจอง: <span style="color: #D685A9;">${bookingId}</span>
                             </div>
-                            <div style="font-size: 14px; color: #666;">
+                            <div style="font-size: 16px; color: #666;">
                                 วันที่ทำรายการ: ${dateStr}
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 25px; line-height: 1.8;">
+                        <div style="margin-bottom: 30px; line-height: 1.8; font-size: 16px;">
                             <p><strong>ข้าพเจ้า:</strong> ${formData.contact.name} &nbsp;&nbsp;&nbsp; <strong>ตำแหน่ง:</strong> ${formData.contact.position}</p>
                             <p><strong>ในนามบริษัท:</strong> ${formData.contact.company}</p>
                             <p><strong>ที่อยู่:</strong> ${formData.contact.address}</p>
                             <p><strong>โทรศัพท์:</strong> ${formData.contact.phone} &nbsp;&nbsp;&nbsp; <strong>โทรสาร:</strong> ${formData.contact.fax || '-'} &nbsp;&nbsp;&nbsp; <strong>E-mail:</strong> ${formData.contact.email}</p>
                         </div>
 
-                        <div style="margin-bottom: 25px; background-color: #fdf2f8; padding: 15px; border-radius: 8px;">
-                            <h4 style="margin-top: 0; color: #b56d8e; font-size: 16px;">รายการสนับสนุน:</h4>
-                            ${pkgDetails}
-                            <div style="margin-top: 15px; border-top: 1px dashed #D685A9; padding-top: 10px; font-size: 18px; font-weight: bold; text-align: right;">
+                        <div style="margin-bottom: 30px; background-color: #fdf2f8; padding: 20px; border-radius: 8px; border: 1px solid #f9d8e6;">
+                            <h4 style="margin-top: 0; color: #b56d8e; font-size: 18px; margin-bottom: 15px;">รายการที่ขอสนับสนุน:</h4>
+                            <div style="font-size: 16px;">
+                                ${pkgDetails}
+                            </div>
+                            <div style="margin-top: 20px; border-top: 1px dashed #D685A9; padding-top: 15px; font-size: 22px; font-weight: bold; text-align: right;">
                                 ยอดรวมทั้งสิ้น: <span style="color: #D685A9;">${totalAmount.toLocaleString()}</span> บาท
                             </div>
                         </div>
-
-                        <div style="margin-bottom: 30px;">
-                            <h4 style="margin-top: 0; font-size: 16px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">วิธีการชำระเงินที่เลือก:</h4>
-                            ${payDetails}
+                        
+                        <div style="margin-bottom: 30px; font-size: 14px;">
+                            <strong>หมายเหตุ:</strong> กรุณานำรหัสใบจอง (<span style="color: #D685A9;">${bookingId}</span>) ไปกรอกในระบบเพื่ออัปโหลดหลักฐานการโอนเงิน หรือแจ้งรายละเอียดเช็ค
                         </div>
 
-                        <div style="font-size: 12px; color: #666; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
+                        <div style="font-size: 14px; color: #555; text-align: center; border-top: 1px solid #ddd; padding-top: 20px; line-height: 1.6;">
                             <strong>กรุณาส่งใบแสดงความจำนง และหลักฐานการชำระเงิน มาที่:</strong><br>
-                            คุณเกศแก้ว เกตุมณี เบอร์โทรศัพท์ 02-2564000 ต่อ 61724 / คุณรุ่งรัตน์ จำปาเงิน เบอร์โทรศัพท์ 02-2564000 ต่อ 61725
+                            คุณเกศแก้ว เกตุมณี เบอร์โทรศัพท์ 02-2564000 ต่อ 61724<br>
+                            คุณรุ่งรัตน์ จำปาเงิน เบอร์โทรศัพท์ 02-2564000 ต่อ 61725
                         </div>
                     </div>
                 `;
 
                 const opt = {
-                    margin:       0,
-                    filename:     `Sponsorship_${bookingId}.pdf`,
+                    margin:       [0.5, 0.5, 0.5, 0.5],
+                    filename:     `Booking_${bookingId}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true },
+                    html2canvas:  { scale: 2, useCORS: true, logging: false },
                     jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
                 };
 
@@ -535,30 +531,21 @@
             });
         }
 
-        // Form Submit
+        // Submit Form
         document.getElementById('registration-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             if (!isAuthReady || !auth.currentUser) {
-                showModal('error', 'ข้อผิดพลาด', 'ระบบยังไม่พร้อมใช้งาน กรุณารอสักครู่แล้วลองใหม่');
+                showModal('error', 'ระบบยังไม่พร้อม', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณารอสักครู่');
                 return;
             }
 
-            // Validation: at least one package selected
-            if (!pkgs.some(p => p.check.checked)) {
-                showModal('error', 'ข้อมูลไม่ครบถ้วน', 'กรุณาเลือกแพ็กเกจการสนับสนุนอย่างน้อย 1 รายการ');
+            const totalAmount = updateTotal();
+            if (totalAmount === 0) {
+                showModal('error', 'ข้อมูลไม่ครบ', 'กรุณาเลือกแพ็กเกจการสนับสนุนอย่างน้อย 1 รายการ');
                 return;
             }
 
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-            
-            // Calculate Total
-            let totalAmount = 0;
-            if (pkgs[0].check.checked) totalAmount += pkgs[0].price * parseInt(pkgs[0].qty.value);
-            if (pkgs[1].check.checked) totalAmount += pkgs[1].price * parseInt(pkgs[1].qty.value);
-            if (pkgs[2].check.checked) totalAmount += pkgs[2].price;
-
-            // Prepare Data
             const formData = {
                 contact: {
                     name: document.getElementById('r_name').value,
@@ -574,230 +561,202 @@
                     pkg2: { selected: pkgs[1].check.checked, qty: parseInt(pkgs[1].qty.value) || 0 },
                     pkg3: { selected: pkgs[2].check.checked }
                 },
-                payment: {
-                    method: paymentMethod,
-                    cheque: paymentMethod === 'cheque' ? {
-                        bank: document.getElementById('cq_bank').value,
-                        branch: document.getElementById('cq_branch').value,
-                        number: document.getElementById('cq_number').value,
-                        date: document.getElementById('cq_date').value
-                    } : null
-                },
                 totalAmount: totalAmount,
                 createdAt: new Date().toISOString(),
-                status: 'pending',
-                slipImage: null // for later upload
+                paymentStatus: 'pending' // pending, slip_uploaded, cheque_info_added
             };
 
-            // Generate Booking ID (ENT27-XXXX)
             const randomNum = Math.floor(1000 + Math.random() * 9000);
             const bookingId = `ENT27-${randomNum}`;
             formData.bookingId = bookingId;
 
-            showLoading('กำลังบันทึกข้อมูลและสร้างเอกสาร...');
+            showLoading('กำลังบันทึกข้อมูลและสร้าง PDF...');
 
             try {
-                // Save to Firestore (CRITICAL RULE 1: Strict Paths)
-                // Path: /artifacts/{appId}/public/data/sponsorships/{bookingId}
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sponsorships', bookingId);
                 await setDoc(docRef, formData);
 
-                // Generate PDF
-                await generateAndDownloadPDF(bookingId, formData, totalAmount);
-                
+                await generatePDF(bookingId, formData, totalAmount);
                 hideLoading();
                 
-                // Show Success
-                showModal('success', 'จองพื้นที่สำเร็จ', 
-                    `รหัสใบจองของคุณคือ <strong><span class="text-xl text-chula">${bookingId}</span></strong><br><br>
-                    ระบบได้ดาวน์โหลดเอกสาร PDF ลงในเครื่องของคุณแล้ว <br>
-                    กรุณาใช้รหัสใบจองนี้ในการอัปโหลดหลักฐานการชำระเงินในภายหลัง`, 
+                showModal('success', 'บันทึกการจองสำเร็จ', 
+                    `รหัสใบจองของคุณคือ <strong><span class="text-2xl text-chula block mt-2">${bookingId}</span></strong><br>
+                    ระบบได้ดาวน์โหลดใบจอง (PDF) เรียบร้อยแล้ว <br><br>
+                    คุณสามารถใช้รหัสนี้ค้นหาเพื่ออัปโหลดสลิปได้ที่แท็บที่ 2`, 
                     () => {
-                        // Reset form
                         document.getElementById('registration-form').reset();
                         pkgs.forEach(pkg => { if(pkg.qty) pkg.qty.disabled = true; });
                         updateTotal();
-                        // Optional: Switch to slip tab and prefill ID
-                        tabSlipBtn.click();
+                        switchTab('slip');
                         document.getElementById('search_booking_id').value = bookingId;
                     }
                 );
-
             } catch (error) {
-                console.error("Error saving document: ", error);
+                console.error("Save error:", error);
                 hideLoading();
-                showModal('error', 'เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+                showModal('error', 'ข้อผิดพลาด', 'บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่');
             }
         });
 
-        
-        let currentUploadBookingId = null;
-        const uploadSection = document.getElementById('upload_section');
-        const alertBox = document.getElementById('upload_alert');
-        let compressedBase64 = null;
+        // ================= Tab 2 Logic =================
 
-        function showAlert(msg, isError = false) {
-            alertBox.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
-            alertBox.classList.add(isError ? 'bg-red-100' : 'bg-green-100', isError ? 'text-red-800' : 'text-green-800');
-            alertBox.innerText = msg;
-        }
+        let currentBookingId = null;
+        let slipBase64 = null;
 
-        function hideAlert() {
-            alertBox.classList.add('hidden');
-        }
+        // Toggle Payment Type in Tab 2
+        const payTypeRadios = document.querySelectorAll('input[name="pay_type"]');
+        payTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                document.querySelectorAll('.payment-type-label').forEach(lbl => lbl.classList.remove('ring-2', 'ring-chula', 'bg-chula-light'));
+                e.target.closest('.payment-type-label').classList.add('ring-2', 'ring-chula', 'bg-chula-light');
 
-        // Search Booking
+                if (e.target.value === 'transfer') {
+                    document.getElementById('panel_transfer').classList.remove('hidden');
+                    document.getElementById('panel_cheque').classList.add('hidden');
+                } else {
+                    document.getElementById('panel_transfer').classList.add('hidden');
+                    document.getElementById('panel_cheque').classList.remove('hidden');
+                }
+            });
+        });
+        // trigger initial state
+        document.querySelector('input[name="pay_type"]:checked').dispatchEvent(new Event('change'));
+
+        // Search
         document.getElementById('search-btn').addEventListener('click', async () => {
             const searchId = document.getElementById('search_booking_id').value.trim().toUpperCase();
-            if (!searchId) {
-                showModal('error', 'แจ้งเตือน', 'กรุณากรอกรหัสใบจอง');
-                return;
-            }
+            if (!searchId) return showModal('error', 'แจ้งเตือน', 'กรุณากรอกรหัสใบจอง');
+            if (!auth.currentUser) return;
 
-            if (!isAuthReady || !auth.currentUser) return;
-
-            showLoading('กำลังค้นหาข้อมูล...');
-            hideAlert();
-
+            showLoading('กำลังค้นหา...');
             try {
-                // CRITICAL RULE 1: Strict Paths
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sponsorships', searchId);
                 const docSnap = await getDoc(docRef);
-
                 hideLoading();
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    currentUploadBookingId = searchId;
+                    currentBookingId = searchId;
                     
-                    // Display Data
                     document.getElementById('disp_booking_id').innerText = data.bookingId;
                     document.getElementById('disp_company').innerText = data.contact.company;
                     document.getElementById('disp_name').innerText = data.contact.name;
                     document.getElementById('disp_total').innerText = data.totalAmount.toLocaleString() + ' บาท';
                     
-                    // Reset upload state
+                    document.getElementById('upload_section').classList.remove('hidden');
                     resetUploadState();
                     
-                    if (data.slipImage) {
-                        showAlert('ใบจองนี้มีการอัปโหลดสลิปแล้ว คุณสามารถอัปโหลดใหม่เพื่อแทนที่รูปเดิมได้');
+                    const alertBox = document.getElementById('upload_alert');
+                    if (data.paymentStatus !== 'pending') {
+                        alertBox.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+                        alertBox.classList.add('bg-green-100', 'text-green-800');
+                        alertBox.innerText = `สถานะ: มีการส่งข้อมูลหลักฐานแล้ว (${data.paymentStatus}) คุณสามารถอัปเดตข้อมูลใหม่ได้`;
+                    } else {
+                        alertBox.classList.add('hidden');
                     }
-                    
-                    uploadSection.classList.remove('hidden');
                 } else {
-                    uploadSection.classList.add('hidden');
-                    showModal('error', 'ไม่พบข้อมูล', `ไม่พบรหัสใบจอง <strong>${searchId}</strong> ในระบบ`);
+                    document.getElementById('upload_section').classList.add('hidden');
+                    showModal('error', 'ไม่พบข้อมูล', `ไม่พบรหัส <strong>${searchId}</strong> ในระบบ`);
                 }
             } catch (error) {
-                console.error("Search error:", error);
+                console.error(error);
                 hideLoading();
-                showModal('error', 'เกิดข้อผิดพลาด', 'ไม่สามารถค้นหาข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+                showModal('error', 'ข้อผิดพลาด', 'ค้นหาไม่สำเร็จ');
             }
         });
 
-        // Image Compression function to stay under 1MB limit for Firestore doc
-        function compressImage(file, callback) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000;
-                    const MAX_HEIGHT = 1000;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
+        // Image compress
+        document.getElementById('slip_file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if(w > 1000) { h *= 1000/w; w = 1000; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        
+                        slipBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                        document.getElementById('slip_preview').src = slipBase64;
+                        document.querySelector('label[for="slip_file"]').classList.add('hidden');
+                        document.getElementById('preview_container').classList.remove('hidden');
                     }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // Compress to JPEG 0.7 quality
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    callback(dataUrl);
+                    img.src = e.target.result;
                 }
-                img.src = e.target.result;
+                reader.readAsDataURL(file);
             }
-            reader.readAsDataURL(file);
-        }
+        });
 
-        const slipInput = document.getElementById('slip_file');
-        const previewContainer = document.getElementById('preview_container');
-        const slipPreview = document.getElementById('slip_preview');
-        const dropZoneLabel = document.querySelector('label[for="slip_file"]');
-        const submitSlipBtn = document.getElementById('submit_slip_btn');
-        const removeBtn = document.getElementById('remove_slip_btn');
+        document.getElementById('remove_slip_btn').addEventListener('click', () => {
+            resetUploadState();
+        });
 
         function resetUploadState() {
-            slipInput.value = '';
-            compressedBase64 = null;
-            previewContainer.classList.add('hidden');
-            dropZoneLabel.classList.remove('hidden');
-            submitSlipBtn.disabled = true;
+            document.getElementById('slip_file').value = '';
+            slipBase64 = null;
+            document.getElementById('preview_container').classList.add('hidden');
+            document.querySelector('label[for="slip_file"]').classList.remove('hidden');
+            
+            // clear cheque fields
+            document.getElementById('cq_bank').value = '';
+            document.getElementById('cq_branch').value = '';
+            document.getElementById('cq_number').value = '';
+            document.getElementById('cq_date').value = '';
         }
 
-        slipInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                if (!file.type.startsWith('image/')) {
-                    showAlert('กรุณาอัปโหลดไฟล์รูปภาพเท่านั้น', true);
-                    return;
-                }
-                hideAlert();
-                
-                showLoading('กำลังประมวลผลรูปภาพ...');
-                compressImage(file, (base64) => {
-                    compressedBase64 = base64;
-                    slipPreview.src = base64;
-                    
-                    dropZoneLabel.classList.add('hidden');
-                    previewContainer.classList.remove('hidden');
-                    submitSlipBtn.disabled = false;
-                    
-                    hideLoading();
-                });
-            }
-        });
+        // Submit Evidence
+        document.getElementById('submit_evidence_btn').addEventListener('click', async () => {
+            if (!currentBookingId || !auth.currentUser) return;
+            
+            const payType = document.querySelector('input[name="pay_type"]:checked').value;
+            let updateData = {};
 
-        removeBtn.addEventListener('click', resetUploadState);
-
-        // Upload Slip Submit
-        submitSlipBtn.addEventListener('click', async () => {
-            if (!currentUploadBookingId || !compressedBase64 || !auth.currentUser) return;
-
-            showLoading('กำลังอัปโหลดหลักฐาน...');
-
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sponsorships', currentUploadBookingId);
-                
-                await updateDoc(docRef, {
-                    slipImage: compressedBase64,
-                    status: 'paid',
+            if (payType === 'transfer') {
+                if (!slipBase64) return showModal('error', 'ข้อมูลไม่ครบ', 'กรุณาอัปโหลดรูปภาพสลิปโอนเงิน');
+                updateData = {
+                    paymentMethod: 'transfer',
+                    slipImage: slipBase64,
+                    chequeDetails: null,
+                    paymentStatus: 'slip_uploaded',
                     updatedAt: new Date().toISOString()
-                });
+                };
+            } else {
+                const bank = document.getElementById('cq_bank').value.trim();
+                const branch = document.getElementById('cq_branch').value.trim();
+                const num = document.getElementById('cq_number').value.trim();
+                
+                if (!bank || !num) return showModal('error', 'ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลธนาคารและเลขที่เช็คให้ครบถ้วน');
+                updateData = {
+                    paymentMethod: 'cheque',
+                    slipImage: null,
+                    chequeDetails: {
+                        bank: bank,
+                        branch: branch,
+                        number: num,
+                        date: document.getElementById('cq_date').value
+                    },
+                    paymentStatus: 'cheque_info_added',
+                    updatedAt: new Date().toISOString()
+                };
+            }
 
+            showLoading('กำลังบันทึกหลักฐาน...');
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sponsorships', currentBookingId);
+                await updateDoc(docRef, updateData);
                 hideLoading();
-                showModal('success', 'อัปโหลดสำเร็จ', 'ระบบได้รับหลักฐานการชำระเงินเรียบร้อยแล้ว ขอบคุณที่ให้การสนับสนุน', () => {
-                    resetUploadState();
-                    uploadSection.classList.add('hidden');
+                
+                showModal('success', 'บันทึกสำเร็จ', 'ระบบได้รับข้อมูลหลักฐานการชำระเงินเรียบร้อยแล้ว', () => {
+                    document.getElementById('upload_section').classList.add('hidden');
                     document.getElementById('search_booking_id').value = '';
                 });
-
             } catch (error) {
-                console.error("Upload error:", error);
+                console.error(error);
                 hideLoading();
-                showModal('error', 'เกิดข้อผิดพลาด', 'ไม่สามารถอัปโหลดข้อมูลได้ (ไฟล์อาจมีขนาดใหญ่เกินไป)');
+                showModal('error', 'ข้อผิดพลาด', 'ไม่สามารถบันทึกได้ กรุณาลองใหม่');
             }
         });
 
