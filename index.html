@@ -13,22 +13,17 @@
         tailwind.config = { theme: { extend: { colors: { chula: { DEFAULT: '#D685A9', dark: '#b56d8e', light: '#fdf2f8' } }, fontFamily: { sans: ['Prompt', 'sans-serif'] } } } }
     </script>
     <script>
-        // ----------------------------------------------------
-        // เอา URL ของ Google Apps Script มาใส่ที่ตัวแปรนี้
-        const SCRIPT_URL = 'YOUR_WEB_APP_URL';
-        // ----------------------------------------------------
-
-        // โหลดข้อมูลเช็คโควต้า Lunch Symposium ตั้งแต่เปิดหน้าเว็บ
+        // --- นำ URL จาก Google Apps Script มาใส่ที่นี่ ---
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8oFGsWDzifJ7-Mg8mjud8T0b8oB4mgXIcZqB0tZK0aoC8iuQLZOHV2HXVYFuwSAnG/exec';
+        
         document.addEventListener('DOMContentLoaded', () => {
             fetch(SCRIPT_URL + "?action=checkQuota")
                 .then(res => res.json())
                 .then(data => {
                     if (data.quotaFull) {
-                        const lunchRadio = document.getElementById('sponsorship-lunch');
-                        const lunchLabel = document.getElementById('label-lunch');
-                        lunchRadio.disabled = true;
-                        lunchLabel.classList.add('text-gray-400', 'line-through');
-                        lunchLabel.innerText += ' (เต็มโควต้า 2 บริษัทแล้ว)';
+                        document.getElementById('sponsorship-lunch').disabled = true;
+                        document.getElementById('label-lunch').classList.add('text-gray-400', 'line-through');
+                        document.getElementById('label-lunch').innerText += ' (เต็มโควต้าแล้ว)';
                     }
                 }).catch(e => console.log('Error checking quota'));
         });
@@ -43,17 +38,30 @@
             document.getElementById('tab-btn-' + tabId.split('-')[0]).classList.add('border-chula', 'text-chula');
         }
 
+        function calculateTotal() {
+            const types = document.getElementsByName('sponsorship');
+            let total = 0;
+            for(let i=0; i<types.length; i++) {
+                if(types[i].checked) {
+                    if(types[i].value.includes('20,000')) {
+                        const amt = document.getElementById('booth-amount-20k').value || 1;
+                        total = 20000 * amt;
+                    } else if (types[i].value.includes('40,000')) {
+                        const amt = document.getElementById('booth-amount-40k').value || 1;
+                        total = 40000 * amt;
+                    } else if (types[i].value.includes('lunch')) {
+                        total = 200000;
+                    }
+                }
+            }
+            document.getElementById('totalAmountDisplay').innerText = total > 0 ? Number(total).toLocaleString() : '0';
+            document.getElementById('totalAmountValue').value = total;
+        }
+
         function toggleReceiptInput() {
             const isOther = document.getElementById('receipt-other').checked;
-            const inputField = document.getElementById('custom-receipt-name');
-            if (isOther) {
-                inputField.classList.remove('hidden');
-                inputField.required = true;
-            } else {
-                inputField.classList.add('hidden');
-                inputField.required = false;
-                inputField.value = '';
-            }
+            document.getElementById('custom-receipt-name').classList.toggle('hidden', !isOther);
+            document.getElementById('custom-receipt-name').required = isOther;
         }
 
         function toggleBoothInput(id) {
@@ -61,19 +69,20 @@
             document.getElementById('booth-amount-40k').classList.add('hidden');
             if(id === '20k') document.getElementById('booth-amount-20k').classList.remove('hidden');
             if(id === '40k') document.getElementById('booth-amount-40k').classList.remove('hidden');
+            calculateTotal();
         }
 
         async function submitBooking(event) {
             event.preventDefault();
             const btn = document.getElementById('submit-btn');
-            btn.innerHTML = 'กำลังประมวลผล...';
-            btn.disabled = true;
+            btn.innerHTML = 'กำลังประมวลผล...'; btn.disabled = true;
 
             const formData = new FormData(event.target);
             const data = {
                 action: 'book',
                 prefix: formData.get('prefix'),
-                name: formData.get('name'),
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
                 position: formData.get('position'),
                 company: formData.get('company'),
                 taxId: formData.get('taxId'),
@@ -83,35 +92,67 @@
                 receiptType: formData.get('receiptType'),
                 receiptCompany: formData.get('customReceiptName'),
                 sponsorship: formData.get('sponsorship'),
-                boothAmount: formData.get('boothAmount20k') || formData.get('boothAmount40k') || ''
+                boothAmount: formData.get('boothAmount20k') || formData.get('boothAmount40k') || '',
+                totalAmount: formData.get('totalAmount')
             };
 
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire('สำเร็จ!', `บันทึกข้อมูลเรียบร้อย\nหมายเลขใบจอง: ${result.bookingNumber}\nยอดรวม: ${Number(data.totalAmount).toLocaleString()} บาท\nระบบส่งยืนยันไปที่อีเมลแล้ว`, 'success');
+                    event.target.reset();
+                    calculateTotal();
+                } else Swal.fire('ข้อผิดพลาด', result.message, 'error');
+            } catch (e) { Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', 'error'); }
+            
+            btn.innerHTML = 'ยืนยันการแสดงความจำนง'; btn.disabled = false;
+        }
+
+        async function searchBooking() {
+            const bookingId = document.getElementById('searchBookingId').value;
+            if(!bookingId) return Swal.fire('แจ้งเตือน', 'กรุณาระบุเลขที่ใบจอง', 'warning');
+            
+            const btn = document.getElementById('btn-search');
+            btn.innerHTML = 'ค้นหา...'; btn.disabled = true;
+
+            try {
+                const response = await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'searchBooking', bookingNumber: bookingId }), 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
                 });
                 const result = await response.json();
                 
                 if (result.success) {
-                    Swal.fire('สำเร็จ!', `บันทึกข้อมูลเรียบร้อย\nหมายเลขใบจองของคุณคือ: ${result.bookingNumber}\nระบบได้ส่ง PDF ยืนยันไปที่อีเมลของคุณแล้ว`, 'success');
-                    event.target.reset();
+                    document.getElementById('confirmCompanyInfo').classList.remove('hidden');
+                    document.getElementById('dispBookingNo').innerText = bookingId;
+                    document.getElementById('dispCompany').innerText = result.company;
+                    document.getElementById('dispName').innerText = result.name;
+                    document.getElementById('dispTotal').innerText = Number(result.total).toLocaleString() + ' บาท';
                 } else {
-                    Swal.fire('ข้อผิดพลาด', result.message, 'error');
+                    document.getElementById('confirmCompanyInfo').classList.add('hidden');
+                    Swal.fire('ไม่พบข้อมูล', result.message, 'error');
                 }
-            } catch (error) {
-                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-            }
-            btn.innerHTML = 'ยืนยันการแสดงความจำนง';
-            btn.disabled = false;
+            } catch (e) { Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อไม่ได้', 'error'); }
+            btn.innerHTML = 'ค้นหาข้อมูล'; btn.disabled = false;
+        }
+
+        function confirmCompany() {
+            document.getElementById('uploadSection').classList.remove('hidden');
+            document.getElementById('btn-confirm-company').classList.add('hidden');
+        }
+
+        function toggleDeliveryEmail() {
+            const method = document.getElementById('deliveryMethod').value;
+            document.getElementById('deliveryEmailBox').classList.toggle('hidden', method !== 'ส่งผ่านอีเมล');
+            document.getElementById('deliveryEmail').required = (method === 'ส่งผ่านอีเมล');
         }
 
         async function submitUpload(event) {
             event.preventDefault();
             const btn = document.getElementById('upload-btn');
-            btn.innerHTML = 'กำลังอัปโหลด...';
-            btn.disabled = true;
+            btn.innerHTML = 'กำลังอัปโหลด...'; btn.disabled = true;
 
             const file = document.getElementById('slipFile').files[0];
             const reader = new FileReader();
@@ -120,31 +161,23 @@
                 const base64 = reader.result.split(',')[1];
                 const data = {
                     action: 'uploadSlip',
-                    bookingNumber: document.getElementById('bookingId').value,
+                    bookingNumber: document.getElementById('dispBookingNo').innerText,
+                    deliveryMethod: document.getElementById('deliveryMethod').value,
+                    deliveryEmail: document.getElementById('deliveryEmail').value,
                     fileName: file.name,
                     mimeType: file.type,
                     fileBase64: base64
                 };
 
                 try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify(data),
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                    });
+                    const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                     const result = await response.json();
                     
                     if (result.success) {
-                        Swal.fire('สำเร็จ!', 'อัปโหลดสลิปเรียบร้อย ระบบได้ส่งอีเมลยืนยันให้ท่านแล้ว', 'success');
-                        event.target.reset();
-                    } else {
-                        Swal.fire('ไม่สำเร็จ', result.message, 'error');
-                    }
-                } catch (error) {
-                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-                }
-                btn.innerHTML = 'อัปโหลดสลิป';
-                btn.disabled = false;
+                        Swal.fire('สำเร็จ!', 'อัปโหลดสลิปเรียบร้อย ระบบได้ส่งอีเมลยืนยันให้ท่านแล้ว', 'success').then(() => location.reload());
+                    } else Swal.fire('ไม่สำเร็จ', result.message, 'error');
+                } catch (e) { Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', 'error'); }
+                btn.innerHTML = 'ยืนยันการแจ้งโอนเงิน'; btn.disabled = false;
             };
             reader.readAsDataURL(file);
         }
@@ -152,109 +185,114 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto px-4 py-10">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-chula-dark mb-2">3rd ENT CU Congress</h1>
             <p class="text-lg text-gray-600">“Clinical practice Reimagined”</p>
         </div>
 
-        <div class="flex border-b border-gray-200 mb-6">
-            <button id="tab-btn-booking" onclick="switchTab('booking-tab')" class="flex-1 py-3 text-center font-medium border-b-2 border-chula text-chula transition">ฟอร์มจองสปอนเซอร์</button>
-            <button id="tab-btn-upload" onclick="switchTab('upload-tab')" class="flex-1 py-3 text-center font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 transition">แจ้งหลักฐานการโอนเงิน</button>
+        <div class="flex border-b border-gray-200 mb-8 bg-white rounded-t-xl overflow-hidden shadow-sm">
+            <button id="tab-btn-booking" onclick="switchTab('booking-tab')" class="flex-1 py-4 text-center font-semibold border-b-2 border-chula text-chula hover:bg-pink-50 transition">📝 แสดงความจำนง</button>
+            <button id="tab-btn-upload" onclick="switchTab('upload-tab')" class="flex-1 py-4 text-center font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:bg-gray-50 transition">💳 แจ้งหลักฐานการโอนเงิน</button>
         </div>
 
         <!-- แท็บฟอร์มจอง -->
-        <div id="booking-tab" class="bg-white rounded-xl shadow-md p-6 md:p-8">
+        <div id="booking-tab" class="bg-white rounded-b-xl rounded-t-none shadow-md p-6 md:p-10">
             <form onsubmit="submitBooking(event)">
-                <h2 class="text-xl font-semibold mb-6 pb-2 border-b">ข้อมูลผู้จอง</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div>
+                <h2 class="text-xl font-bold text-gray-700 mb-6 pb-2 border-b-2 border-gray-100">1. ข้อมูลผู้ประสานงาน</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="md:col-span-1">
                         <label class="block text-sm font-medium mb-1">คำนำหน้า <span class="text-red-500">*</span></label>
-                        <select name="prefix" required class="w-full border rounded-lg p-2.5 focus:ring-chula focus:border-chula">
+                        <select name="prefix" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-chula focus:outline-none">
                             <option value="">เลือก</option>
                             <option value="นาย">นาย</option>
                             <option value="นาง">นาง</option>
                             <option value="นางสาว">นางสาว</option>
-                            <option value="นพ.">นพ.</option>
-                            <option value="พญ.">พญ.</option>
-                            <option value="">อื่นๆ</option>
                         </select>
                     </div>
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-medium mb-1">ชื่อ <span class="text-red-500">*</span></label>
+                        <input type="text" name="firstName" required class="w-full border border-gray-300 rounded-lg p-3">
+                    </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium mb-1">ชื่อ-สกุล <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" required class="w-full border rounded-lg p-2.5 focus:ring-chula focus:border-chula">
+                        <label class="block text-sm font-medium mb-1">นามสกุล <span class="text-red-500">*</span></label>
+                        <input type="text" name="lastName" required class="w-full border border-gray-300 rounded-lg p-3">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <label class="block text-sm font-medium mb-1">ตำแหน่ง <span class="text-red-500">*</span></label>
-                        <input type="text" name="position" required class="w-full border rounded-lg p-2.5">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">บริษัท <span class="text-red-500">*</span></label>
-                        <input type="text" name="company" required class="w-full border rounded-lg p-2.5">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium mb-1">เลขประจำตัวผู้เสียภาษีอากรของบริษัท <span class="text-red-500">*</span></label>
-                        <input type="text" name="taxId" required class="w-full border rounded-lg p-2.5">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium mb-1">ที่อยู่บริษัท <span class="text-red-500">*</span></label>
-                        <textarea name="address" required rows="2" class="w-full border rounded-lg p-2.5"></textarea>
+                        <input type="text" name="position" required class="w-full border border-gray-300 rounded-lg p-3">
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">โทรศัพท์ <span class="text-red-500">*</span></label>
-                        <input type="tel" name="phone" required class="w-full border rounded-lg p-2.5">
+                        <input type="tel" name="phone" required class="w-full border border-gray-300 rounded-lg p-3">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-1">E-mail <span class="text-red-500">*</span></label>
+                        <input type="email" name="email" required class="w-full border border-gray-300 rounded-lg p-3">
+                    </div>
+                </div>
+
+                <h2 class="text-xl font-bold text-gray-700 mb-6 pb-2 border-b-2 border-gray-100">2. ข้อมูลบริษัทและการออกใบเสร็จ</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">ในนามบริษัท <span class="text-red-500">*</span></label>
+                        <input type="text" name="company" required class="w-full border border-gray-300 rounded-lg p-3">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">E-mail <span class="text-red-500">*</span></label>
-                        <input type="email" name="email" required class="w-full border rounded-lg p-2.5">
+                        <label class="block text-sm font-medium mb-1">เลขประจำตัวผู้เสียภาษีอากร <span class="text-red-500">*</span></label>
+                        <input type="text" name="taxId" required class="w-full border border-gray-300 rounded-lg p-3">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-1">ที่อยู่บริษัท <span class="text-red-500">*</span></label>
+                        <textarea name="address" required rows="2" class="w-full border border-gray-300 rounded-lg p-3"></textarea>
                     </div>
                 </div>
 
-                <h2 class="text-xl font-semibold mt-8 mb-4 pb-2 border-b">รายละเอียดการออกใบเสร็จ</h2>
-                <div class="space-y-3 mb-8">
-                    <label class="flex items-center space-x-3">
-                        <input type="radio" name="receiptType" value="same" onclick="toggleReceiptInput()" checked class="w-4 h-4 text-chula focus:ring-chula">
-                        <span>ออกใบเสร็จในนามบริษัทที่แจ้งข้างต้น</span>
+                <div class="space-y-3 mb-8 bg-gray-50 p-4 rounded-lg border">
+                    <p class="font-medium mb-2 text-sm">ความประสงค์การออกใบเสร็จ:</p>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="receiptType" value="same" onclick="toggleReceiptInput()" checked class="w-4 h-4 text-chula">
+                        <span>ออกใบเสร็จในนามบริษัทที่แจ้งด้านบน</span>
                     </label>
-                    <label class="flex items-center space-x-3">
-                        <input type="radio" id="receipt-other" name="receiptType" value="other" onclick="toggleReceiptInput()" class="w-4 h-4 text-chula focus:ring-chula">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" id="receipt-other" name="receiptType" value="other" onclick="toggleReceiptInput()" class="w-4 h-4 text-chula">
                         <span>ออกใบเสร็จในนามบริษัทอื่น (โปรดระบุ)</span>
                     </label>
-                    <input type="text" id="custom-receipt-name" name="customReceiptName" placeholder="ระบุชื่อบริษัทที่ต้องการให้ออกใบเสร็จ..." class="w-full border rounded-lg p-2.5 hidden">
+                    <input type="text" id="custom-receipt-name" name="customReceiptName" placeholder="ระบุชื่อและที่อยู่บริษัท..." class="w-full border rounded-lg p-3 hidden mt-2">
                 </div>
 
-                <h2 class="text-xl font-semibold mt-8 mb-4 pb-2 border-b">รูปแบบการสนับสนุน (เลือก 1 อย่าง) <span class="text-red-500">*</span></h2>
+                <h2 class="text-xl font-bold text-gray-700 mb-6 pb-2 border-b-2 border-gray-100">3. รูปแบบการสนับสนุน <span class="text-red-500">*</span></h2>
                 <div class="space-y-4 mb-8">
-                    <div class="p-4 border rounded-lg hover:bg-chula-light transition">
-                        <label class="flex items-start space-x-3 cursor-pointer">
-                            <input type="radio" name="sponsorship" value="20,000 บาท/booth" onclick="toggleBoothInput('20k')" required class="mt-1 w-4 h-4 text-chula focus:ring-chula">
+                    <div class="p-5 border border-gray-200 rounded-xl hover:border-chula transition bg-white shadow-sm">
+                        <label class="flex items-start space-x-4 cursor-pointer">
+                            <input type="radio" name="sponsorship" value="20,000 บาท/booth" onclick="toggleBoothInput('20k')" required class="mt-1 w-5 h-5 text-chula">
                             <div class="flex-1">
-                                <span class="font-medium text-gray-800">เงินสนับสนุน 20,000 บาท/booth (1.5m x 0.75m)</span>
-                                <input type="number" id="booth-amount-20k" name="boothAmount20k" placeholder="ระบุจำนวนบูธ" class="mt-2 w-full md:w-1/3 border rounded p-2 hidden">
+                                <span class="font-semibold text-lg text-gray-800">20,000 บาท/booth (ขนาด 1.5m x 0.75m)</span>
+                                <input type="number" id="booth-amount-20k" name="boothAmount20k" min="1" value="1" oninput="calculateTotal()" class="mt-3 w-full md:w-1/3 border rounded-lg p-2 hidden">
                             </div>
                         </label>
                     </div>
 
-                    <div class="p-4 border rounded-lg hover:bg-chula-light transition">
-                        <label class="flex items-start space-x-3 cursor-pointer">
-                            <input type="radio" name="sponsorship" value="40,000 บาท/booth" onclick="toggleBoothInput('40k')" class="mt-1 w-4 h-4 text-chula focus:ring-chula">
+                    <div class="p-5 border border-gray-200 rounded-xl hover:border-chula transition bg-white shadow-sm">
+                        <label class="flex items-start space-x-4 cursor-pointer">
+                            <input type="radio" name="sponsorship" value="40,000 บาท/booth" onclick="toggleBoothInput('40k')" class="mt-1 w-5 h-5 text-chula">
                             <div class="flex-1">
-                                <span class="font-medium text-gray-800">เงินสนับสนุน 40,000 บาท/booth (3m x 0.75m)</span>
-                                <input type="number" id="booth-amount-40k" name="boothAmount40k" placeholder="ระบุจำนวนบูธ" class="mt-2 w-full md:w-1/3 border rounded p-2 hidden">
+                                <span class="font-semibold text-lg text-gray-800">40,000 บาท/booth (ขนาด 3m x 0.75m)</span>
+                                <input type="number" id="booth-amount-40k" name="boothAmount40k" min="1" value="1" oninput="calculateTotal()" class="mt-3 w-full md:w-1/3 border rounded-lg p-2 hidden">
                             </div>
                         </label>
                     </div>
 
-                    <div class="p-4 border rounded-lg hover:bg-chula-light transition">
-                        <label class="flex items-start space-x-3 cursor-pointer">
-                            <input type="radio" id="sponsorship-lunch" name="sponsorship" value="lunch symposium 200,000 บาท" onclick="toggleBoothInput('none')" class="mt-1 w-4 h-4 text-chula focus:ring-chula">
+                    <div class="p-5 border border-gray-200 rounded-xl hover:border-chula transition bg-white shadow-sm">
+                        <label class="flex items-start space-x-4 cursor-pointer">
+                            <input type="radio" id="sponsorship-lunch" name="sponsorship" value="lunch symposium 200,000 บาท" onclick="toggleBoothInput('none')" class="mt-1 w-5 h-5 text-chula">
                             <div>
-                                <span id="label-lunch" class="font-medium text-gray-800">เงินสนับสนุน lunch symposium 200,000 บาท</span>
-                                <ul class="list-disc ml-5 mt-2 text-sm text-gray-600">
-                                    <li>Booth ขนาด (3m x 0.75m) 1 booth</li>
+                                <span id="label-lunch" class="font-semibold text-lg text-gray-800">Lunch Symposium 200,000 บาท <span class="text-sm font-normal text-red-500">(จำกัดไม่เกิน 2 บริษัท)</span></span>
+                                <ul class="list-disc ml-6 mt-3 space-y-1 text-sm text-gray-600">
+                                    <li>Booth ขนาด (3m x 0.75m) จำนวน 1 booth</li>
                                     <li>Lecture 1 session from company</li>
                                     <li>แพทย์ลงทะเบียน lecture 25 ท่าน และ lecture + workshop 5 ท่าน</li>
                                 </ul>
@@ -263,35 +301,80 @@
                     </div>
                 </div>
 
-                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-8">
-                    <p class="text-red-700 font-medium">หมายเหตุ: ขอให้ท่านแจ้งหลักฐานการโอนเงินภายใน 29 มกราคม 2570</p>
+                <!-- สรุปยอด -->
+                <div class="bg-pink-50 p-6 rounded-xl border border-pink-100 flex justify-between items-center mb-8">
+                    <span class="text-lg font-bold text-gray-700">ยอดรวมเงินสนับสนุนทั้งสิ้น:</span>
+                    <span class="text-3xl font-bold text-chula-dark"><span id="totalAmountDisplay">0</span> บาท</span>
+                    <input type="hidden" name="totalAmount" id="totalAmountValue" value="0">
                 </div>
 
-                <button type="submit" id="submit-btn" class="w-full bg-chula text-white font-bold py-3 px-4 rounded-lg hover:bg-chula-dark transition shadow-lg">ยืนยันการแสดงความจำนง</button>
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-8">
+                    <p class="text-red-700 font-medium">หมายเหตุ: ขอให้ท่านแจ้งหลักฐานการโอนเงินภายในวันที่ 29 มกราคม 2570</p>
+                </div>
+
+                <button type="submit" id="submit-btn" class="w-full bg-chula text-white font-bold text-lg py-4 px-4 rounded-xl hover:bg-chula-dark transition shadow-lg">ยืนยันการแสดงความจำนง</button>
             </form>
         </div>
 
         <!-- แท็บแนบสลิป -->
-        <div id="upload-tab" class="bg-white rounded-xl shadow-md p-6 md:p-8 hidden">
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                <p class="text-blue-800 font-medium">📌 เลขการจองอยู่ในอีเมล กรุณาตรวจสอบอีเมลทุกครั้ง ที่ท่านได้รับหลังจากการจอง</p>
+        <div id="upload-tab" class="bg-white rounded-b-xl rounded-t-none shadow-md p-6 md:p-10 hidden">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8">
+                <p class="text-blue-800 font-medium">📌 หมายเลขใบจองจะถูกส่งไปที่อีเมลของท่าน กรุณาตรวจสอบอีเมลทุกครั้งหลังทำรายการจอง</p>
             </div>
             
-            <form onsubmit="submitUpload(event)">
-                <div class="mb-5">
-                    <label class="block text-sm font-medium mb-1">เลขที่ใบจอง <span class="text-red-500">*</span></label>
-                    <input type="text" id="bookingId" placeholder="เช่น 01, 02" required class="w-full border rounded-lg p-2.5 focus:ring-chula focus:border-chula">
+            <div class="flex gap-4 mb-8">
+                <input type="text" id="searchBookingId" placeholder="ระบุเลขที่ใบจอง เช่น 01" class="flex-1 border border-gray-300 rounded-lg p-3 text-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                <button type="button" id="btn-search" onclick="searchBooking()" class="bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-blue-700 transition">ค้นหาข้อมูล</button>
+            </div>
+
+            <!-- กล่องแสดงข้อมูลเมื่อค้นหาเจอ -->
+            <div id="confirmCompanyInfo" class="hidden">
+                <div class="bg-gray-50 border p-6 rounded-xl mb-6">
+                    <h3 class="text-lg font-bold mb-4 border-b pb-2">ข้อมูลการจอง</h3>
+                    <div class="grid grid-cols-2 gap-y-3 text-sm">
+                        <div class="text-gray-500">หมายเลขใบจอง:</div>
+                        <div class="font-bold text-gray-900" id="dispBookingNo"></div>
+                        <div class="text-gray-500">ชื่อผู้จอง:</div>
+                        <div class="font-bold text-gray-900" id="dispName"></div>
+                        <div class="text-gray-500">บริษัท:</div>
+                        <div class="font-bold text-gray-900" id="dispCompany"></div>
+                        <div class="text-gray-500">ยอดชำระ:</div>
+                        <div class="font-bold text-chula-dark text-lg" id="dispTotal"></div>
+                    </div>
                 </div>
                 
-                <div class="mb-8">
-                    <label class="block text-sm font-medium mb-1">แนบไฟล์สลิป (รูปภาพหรือ PDF) <span class="text-red-500">*</span></label>
-                    <input type="file" id="slipFile" accept="image/*,.pdf" required class="w-full border rounded-lg p-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-chula-light file:text-chula-dark hover:file:bg-pink-100">
+                <button type="button" id="btn-confirm-company" onclick="confirmCompany()" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition mb-6">ยืนยันข้อมูลถูกต้อง</button>
+                
+                <!-- ส่วนอัปโหลดและรับเอกสาร -->
+                <div id="uploadSection" class="hidden">
+                    <form onsubmit="submitUpload(event)" class="space-y-6">
+                        
+                        <div class="bg-green-50 border-l-4 border-green-500 p-5 rounded-r-lg">
+                            <p class="text-green-800 font-medium mb-3">ท่านจะได้รับใบตอบขอบคุณ และใบลดหย่อนภาษี จากมูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์</p>
+                            <label class="block text-sm font-bold mb-2">ความประสงค์การรับเอกสาร <span class="text-red-500">*</span></label>
+                            <select id="deliveryMethod" required onchange="toggleDeliveryEmail()" class="w-full border p-3 rounded-lg bg-white">
+                                <option value="">-- เลือกวิธีรับเอกสาร --</option>
+                                <option value="มารับตัวจริงด้วยตนเอง ที่คุณเกศแก้ว (เดียร์) เจ้าหน้าที่ธุรการ">มารับตัวจริงด้วยตนเอง ที่คุณเกศแก้ว (เดียร์) เจ้าหน้าที่ธุรการ</option>
+                                <option value="ส่งผ่านอีเมล">จัดส่งผ่านอีเมล</option>
+                            </select>
+                            
+                            <div id="deliveryEmailBox" class="mt-3 hidden">
+                                <label class="block text-sm font-medium mb-1">ระบุอีเมลสำหรับจัดส่ง <span class="text-red-500">*</span></label>
+                                <input type="email" id="deliveryEmail" placeholder="example@email.com" class="w-full border p-3 rounded-lg">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold mb-2">แนบหลักฐานการโอนเงิน (รูปภาพหรือ PDF) <span class="text-red-500">*</span></label>
+                            <input type="file" id="slipFile" accept="image/*,.pdf" required class="w-full border rounded-lg p-2 text-sm file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                        </div>
+
+                        <button type="submit" id="upload-btn" class="w-full bg-blue-600 text-white font-bold text-lg py-4 px-4 rounded-xl hover:bg-blue-700 transition shadow-lg">ยืนยันการแจ้งโอนเงิน</button>
+                    </form>
                 </div>
+            </div>
 
-                <button type="submit" id="upload-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition shadow-lg">อัปโหลดสลิป</button>
-            </form>
         </div>
-
     </div>
 </body>
 </html>
