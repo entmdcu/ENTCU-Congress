@@ -14,7 +14,7 @@
     </script>
     <script>
         // --- นำ URL จาก Google Apps Script มาใส่ที่นี่ ---
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBqmBZQzFzE93mI3Wp6wIbZMnkfefd5w_Ye4fNPL2ZMjEZHxhrbYstVrpb4ux6o-ek/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLXAOadh-lD4-8GstR9ch61rSA85PE0M29JJxQkmHmisFPksC7gUvn_9xwwPRCU_hx/exec';
         
         document.addEventListener('DOMContentLoaded', () => {
             fetch(SCRIPT_URL + "?action=checkQuota")
@@ -72,9 +72,9 @@
             calculateTotal();
         }
 
-        function togglePaymentMethod() {
-            const isCheque = document.getElementById('payment-cheque').checked;
-            const fields = document.getElementById('cheque-fields');
+        function toggleUploadPaymentMethod() {
+            const isCheque = document.getElementById('actual-payment-cheque').checked;
+            const fields = document.getElementById('upload-cheque-fields');
             const inputs = fields.querySelectorAll('input');
             
             if (isCheque) {
@@ -108,21 +108,16 @@
                 sponsorship: formData.get('sponsorship'),
                 boothAmount: formData.get('boothAmount20k') || formData.get('boothAmount40k') || '',
                 totalAmount: formData.get('totalAmount'),
-                paymentMethod: formData.get('paymentMethod'),
-                chequeBank: formData.get('chequeBank'),
-                chequeBranch: formData.get('chequeBranch'),
-                chequeNo: formData.get('chequeNo'),
-                chequeDate: formData.get('chequeDate')
+                paymentMethod: formData.get('paymentMethod') // แค่สอบถามความจำนง
             };
 
             try {
                 const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                 const result = await response.json();
                 if (result.success) {
-                    Swal.fire('สำเร็จ!', `บันทึกข้อมูลเรียบร้อย\nหมายเลขใบจอง: ${result.bookingNumber}\nระบบได้จัดส่งเอกสารยืนยันไปที่อีเมลของท่านแล้ว`, 'success');
+                    Swal.fire('สำเร็จ!', `บันทึกการแสดงความจำนงเรียบร้อย\nหมายเลขใบจอง: ${result.bookingNumber}\nสามารถแจ้งหลักฐานชำระเงินในภายหลังได้\n(ระบบจัดส่งเอกสารไปที่อีเมลแล้ว)`, 'success');
                     event.target.reset();
                     calculateTotal();
-                    togglePaymentMethod();
                 } else Swal.fire('ข้อผิดพลาด', result.message, 'error');
             } catch (e) { Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', 'error'); }
             
@@ -130,7 +125,7 @@
         }
 
         async function searchBooking() {
-            const bookingId = document.getElementById('searchBookingId').value;
+            const bookingId = document.getElementById('searchBookingId').value.trim();
             if(!bookingId) return Swal.fire('แจ้งเตือน', 'กรุณาระบุเลขที่ใบจอง', 'warning');
             
             const btn = document.getElementById('btn-search');
@@ -175,6 +170,7 @@
             btn.innerHTML = 'กำลังอัปโหลด...'; btn.disabled = true;
 
             const file = document.getElementById('slipFile').files[0];
+            const actualMethod = document.querySelector('input[name="actualPaymentMethod"]:checked').value;
             const reader = new FileReader();
             
             reader.onload = async function() {
@@ -184,6 +180,11 @@
                     bookingNumber: document.getElementById('dispBookingNo').innerText,
                     deliveryMethod: document.getElementById('deliveryMethod').value,
                     deliveryEmail: document.getElementById('deliveryEmail').value,
+                    actualPaymentMethod: actualMethod,
+                    chequeBank: document.getElementById('upChequeBank').value,
+                    chequeBranch: document.getElementById('upChequeBranch').value,
+                    chequeNo: document.getElementById('upChequeNo').value,
+                    chequeDate: document.getElementById('upChequeDate').value,
                     fileName: file.name,
                     mimeType: file.type,
                     fileBase64: base64
@@ -197,7 +198,7 @@
                         Swal.fire('สำเร็จ!', 'อัปโหลดสลิปเรียบร้อย ระบบได้ส่งอีเมลยืนยันให้ท่านแล้ว', 'success').then(() => location.reload());
                     } else Swal.fire('ไม่สำเร็จ', result.message, 'error');
                 } catch (e) { Swal.fire('ข้อผิดพลาด', 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', 'error'); }
-                btn.innerHTML = 'ยืนยันการแจ้งโอนเงิน'; btn.disabled = false;
+                btn.innerHTML = 'ยืนยันการแจ้งชำระเงิน'; btn.disabled = false;
             };
             reader.readAsDataURL(file);
         }
@@ -206,7 +207,7 @@
 <body class="bg-gray-50 text-gray-800">
 
     <div class="max-w-4xl mx-auto px-4 py-10">
-        <!-- เปลี่ยน Header เป็นชื่อเต็มที่ให้มา -->
+        <!-- Header -->
         <div class="text-center mb-8 space-y-2">
             <h1 class="text-2xl md:text-3xl font-bold text-chula-dark">การสนับสนุนการประชุมวิชาการ</h1>
             <h2 class="text-xl md:text-2xl font-bold text-gray-800">the 3rd ENT CU Congress “Clinical practice Reimagined”</h2>
@@ -216,16 +217,16 @@
 
         <div class="flex border-b border-gray-200 mb-8 bg-white rounded-t-xl overflow-hidden shadow-sm">
             <button id="tab-btn-booking" onclick="switchTab('booking-tab')" class="flex-1 py-4 text-center font-semibold border-b-2 border-chula text-chula hover:bg-pink-50 transition">📝 แสดงความจำนง</button>
-            <button id="tab-btn-upload" onclick="switchTab('upload-tab')" class="flex-1 py-4 text-center font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:bg-gray-50 transition">💳 แจ้งหลักฐานการโอนเงิน</button>
+            <button id="tab-btn-upload" onclick="switchTab('upload-tab')" class="flex-1 py-4 text-center font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:bg-gray-50 transition">💳 แจ้งหลักฐานการโอนเงิน/เช็ค</button>
         </div>
 
         <!-- แท็บฟอร์มจอง -->
         <div id="booking-tab" class="bg-white rounded-b-xl rounded-t-none shadow-md p-6 md:p-10">
             
-            <!-- กล่องแจ้งชำระเงินโดดเด่น -->
+            <!-- กล่องแจ้งชำระเงิน (จองก่อนจ่ายทีหลัง) -->
             <div class="bg-red-50 border-l-4 border-red-500 p-6 mb-8 rounded-r-lg shadow-sm">
                 <h3 class="text-red-700 font-bold text-lg mb-2">⚠️ ข้อมูลสำคัญสำหรับการชำระเงิน</h3>
-                <p class="text-red-700 font-medium mb-4">หมายเหตุ: ขอให้ท่านแจ้งหลักฐานการโอนเงินภายในวันที่ 29 มกราคม 2570</p>
+                <p class="text-red-700 font-medium mb-4">หมายเหตุ: ท่านสามารถทำรายการจองไว้ก่อน และดำเนินการแจ้งหลักฐานการชำระเงินภายในวันที่ 29 มกราคม 2570</p>
                 
                 <div class="bg-white p-5 rounded-lg border border-red-200 text-gray-800 text-sm space-y-3">
                     <p class="flex flex-col md:flex-row md:items-start gap-2">
@@ -241,7 +242,7 @@
                     </p>
                     <hr class="border-gray-100">
                     <p class="pt-2 text-gray-700 leading-relaxed">
-                        <strong>ส่งใบแสดงความจำนง และเช็ค มาที่:</strong><br>
+                        <strong>ติดต่อ:</strong><br>
                         คุณเกศแก้ว เกตุมณี (เบอร์โทรศัพท์ 02-2564000 ต่อ 61724)<br>
                         คุณรุ่งรัตน์ จำปาเงิน (เบอร์โทรศัพท์ 02-2564000 ต่อ 61725)<br>
                         <strong>E-mail:</strong> <a href="mailto:entcu.congress@gmail.com" class="text-blue-600 hover:underline">entcu.congress@gmail.com</a>
@@ -358,39 +359,18 @@
                     <input type="hidden" name="totalAmount" id="totalAmountValue" value="0">
                 </div>
 
-                <!-- เพิ่มหมวดหมู่การชำระเงิน -->
-                <h2 class="text-xl font-bold text-gray-700 mb-6 pb-2 border-b-2 border-gray-100">4. วิธีการชำระเงิน <span class="text-red-500">*</span></h2>
+                <!-- สอบถามความจำนงวิธีการชำระเงิน -->
+                <h2 class="text-xl font-bold text-gray-700 mb-6 pb-2 border-b-2 border-gray-100">4. ความจำนงวิธีการชำระเงิน <span class="text-red-500">*</span></h2>
                 <div class="space-y-4 mb-8">
                     <label class="flex items-center space-x-3 cursor-pointer">
-                        <input type="radio" name="paymentMethod" value="โอนเงิน" onclick="togglePaymentMethod()" required class="w-5 h-5 text-chula">
-                        <span class="font-medium text-lg">โอนเงินเข้าบัญชีธนาคาร</span>
+                        <input type="radio" name="paymentMethod" value="โอนเงิน" required class="w-5 h-5 text-chula">
+                        <span class="font-medium text-lg text-gray-700">จะชำระโดยการโอนเงินเข้าบัญชี</span>
                     </label>
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="radio" id="payment-cheque" name="paymentMethod" value="เช็คธนาคาร" onclick="togglePaymentMethod()" class="mt-1 w-5 h-5 text-chula">
-                        <div class="w-full">
-                            <span class="font-medium text-lg">จ่ายด้วยเช็คธนาคาร</span>
-                            
-                            <!-- ช่องกรอกข้อมูลเช็ค -->
-                            <div id="cheque-fields" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 hidden bg-gray-50 p-4 rounded-lg border">
-                                <div>
-                                    <label class="block text-sm mb-1">ธนาคาร <span class="text-red-500">*</span></label>
-                                    <input type="text" name="chequeBank" placeholder="เช่น ไทยพาณิชย์" class="w-full border rounded-lg p-2.5">
-                                </div>
-                                <div>
-                                    <label class="block text-sm mb-1">สาขา <span class="text-red-500">*</span></label>
-                                    <input type="text" name="chequeBranch" class="w-full border rounded-lg p-2.5">
-                                </div>
-                                <div>
-                                    <label class="block text-sm mb-1">เช็คเลขที่ <span class="text-red-500">*</span></label>
-                                    <input type="text" name="chequeNo" class="w-full border rounded-lg p-2.5">
-                                </div>
-                                <div>
-                                    <label class="block text-sm mb-1">ลงวันที่ <span class="text-red-500">*</span></label>
-                                    <input type="date" name="chequeDate" class="w-full border rounded-lg p-2.5">
-                                </div>
-                            </div>
-                        </div>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="paymentMethod" value="เช็คธนาคาร" class="w-5 h-5 text-chula">
+                        <span class="font-medium text-lg text-gray-700">จะชำระด้วยเช็คธนาคาร</span>
                     </label>
+                    <p class="text-sm text-gray-500 mt-2 ml-8">(ท่านสามารถดำเนินการจองไว้ก่อน แล้วแนบหลักฐานการโอน/เช็ค ได้ในภายหลังที่แท็บถัดไป)</p>
                 </div>
 
                 <button type="submit" id="submit-btn" class="w-full bg-chula text-white font-bold text-lg py-4 px-4 rounded-xl hover:bg-chula-dark transition shadow-lg">ยืนยันการแสดงความจำนง</button>
@@ -430,6 +410,30 @@
                 <div id="uploadSection" class="hidden">
                     <form onsubmit="submitUpload(event)" class="space-y-6">
                         
+                        <!-- ให้ลูกค้าระบุช่องทางที่จ่ายจริง -->
+                        <div class="bg-orange-50 border-l-4 border-orange-400 p-5 rounded-r-lg">
+                            <label class="block text-sm font-bold text-gray-800 mb-3">ช่องทางการชำระเงินที่ท่านได้ดำเนินการ <span class="text-red-500">*</span></label>
+                            <div class="space-y-3">
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="actualPaymentMethod" value="โอนเงิน" onclick="toggleUploadPaymentMethod()" required class="w-4 h-4 text-orange-600">
+                                    <span class="font-medium text-gray-800">โอนเงินเข้าบัญชีธนาคาร</span>
+                                </label>
+                                <label class="flex items-start space-x-3 cursor-pointer">
+                                    <input type="radio" id="actual-payment-cheque" name="actualPaymentMethod" value="เช็คธนาคาร" onclick="toggleUploadPaymentMethod()" class="mt-1 w-4 h-4 text-orange-600">
+                                    <div class="w-full">
+                                        <span class="font-medium text-gray-800">จ่ายด้วยเช็คธนาคาร</span>
+                                        <!-- ช่องกรอกข้อมูลเช็คจะโชว์เมื่อคลิก -->
+                                        <div id="upload-cheque-fields" class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 hidden bg-white p-4 rounded-lg border border-orange-200 text-sm">
+                                            <div><label class="mb-1 block text-gray-600">ธนาคาร <span class="text-red-500">*</span></label><input type="text" id="upChequeBank" placeholder="เช่น ไทยพาณิชย์" class="w-full border rounded p-2 focus:ring-orange-300 focus:border-orange-300"></div>
+                                            <div><label class="mb-1 block text-gray-600">สาขา <span class="text-red-500">*</span></label><input type="text" id="upChequeBranch" class="w-full border rounded p-2 focus:ring-orange-300 focus:border-orange-300"></div>
+                                            <div><label class="mb-1 block text-gray-600">เช็คเลขที่ <span class="text-red-500">*</span></label><input type="text" id="upChequeNo" class="w-full border rounded p-2 focus:ring-orange-300 focus:border-orange-300"></div>
+                                            <div><label class="mb-1 block text-gray-600">ลงวันที่ <span class="text-red-500">*</span></label><input type="date" id="upChequeDate" class="w-full border rounded p-2 focus:ring-orange-300 focus:border-orange-300"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="bg-green-50 border-l-4 border-green-500 p-5 rounded-r-lg">
                             <p class="text-green-800 font-medium mb-3">ท่านจะได้รับใบตอบขอบคุณ และใบลดหย่อนภาษี จากมูลนิธิคณะแพทยศาสตร์ จุฬาลงกรณ์</p>
                             <label class="block text-sm font-bold mb-2">ความประสงค์การรับเอกสาร <span class="text-red-500">*</span></label>
@@ -450,7 +454,7 @@
                             <input type="file" id="slipFile" accept="image/*,.pdf" required class="w-full border rounded-lg p-2 text-sm file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
                         </div>
 
-                        <button type="submit" id="upload-btn" class="w-full bg-blue-600 text-white font-bold text-lg py-4 px-4 rounded-xl hover:bg-blue-700 transition shadow-lg">ยืนยันการแจ้งโอนเงิน</button>
+                        <button type="submit" id="upload-btn" class="w-full bg-blue-600 text-white font-bold text-lg py-4 px-4 rounded-xl hover:bg-blue-700 transition shadow-lg">ยืนยันการแจ้งชำระเงิน</button>
                     </form>
                 </div>
             </div>
